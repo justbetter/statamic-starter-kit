@@ -1,0 +1,1 @@
+{!! Statamic::tag('structured-data:head')->fetch() !!}

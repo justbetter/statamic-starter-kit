@@ -1,0 +1,40 @@
+{
+    "name": "justbetter/statamic-starter-kit",
+    "require": {
+        "justbetter/statamic-starter-kit": "@dev"
+    },
+    "extra": {
+        "statamic": {
+            "name": "JustBetter Starter Kit",
+            "description": "A description of your starter kit"
+        },
+        "laravel": {
+            "providers": [
+                "Justbetter\\JustBetterStarterKit\\ServiceProvider"
+            ]
+        }
+    },
+    "authors": [
+        {
+            "name": "Kevin Meijer",
+            "email": "kevin@justbetter.nl",
+            "role": "Developer"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "path",
+            "url": "package"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Justbetter\\JustBetterStarterKit\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests"
+        }
+    }
+}
