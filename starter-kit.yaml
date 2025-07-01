@@ -24,28 +24,3 @@ dependencies:
   justbetter/statamic-glide-directive: ^2.6
   rapidez/blade-directives: ^1.1
   statamic/eloquent-driver: ^4.21
-modules:
-  seo:
-    prompt: 'Would you like to use a SEO addon?'
-    options:
-      aardvark:
-        export_paths:
-          - resources/views/layouts/seo/
-        dependencies:
-          withcandour/aardvark-seo: ^5.0
-      statamic-seo:
-        dependencies:
-          statamic/seo-pro: ^6.7
-  cache:
-    prompt: 'Would you like to use the Cloudflare Purge addon?'
-    default: true
-    dependencies:
-      justbetter/statamic-cloudflare-purge: dev-master
-  structured_data:
-    prompt: 'Would you like to use the Structured Data addon?'
-    default: true
-    export_paths:
-      - config/justbetter/structured-data.php
-      - resources/views/layouts/structured-data/head.blade.php
-    dependencies:
-      justbetter/statamic-structured-data: ^1.3
