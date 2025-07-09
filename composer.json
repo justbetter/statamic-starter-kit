@@ -6,7 +6,7 @@
     "extra": {
         "statamic": {
             "name": "JustBetter Starter Kit",
-            "description": "A description of your starter kit"
+            "description": "A Statamic starter kit for new projects that use Statamic"
         },
         "laravel": {
             "providers": [
