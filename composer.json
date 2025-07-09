@@ -1,8 +1,5 @@
 {
     "name": "justbetter/statamic-starter-kit",
-    "require": {
-        "justbetter/statamic-starter-kit": "@dev"
-    },
     "extra": {
         "statamic": {
             "name": "JustBetter Starter Kit",
