@@ -1,6 +1,5 @@
 <?php
 
-use DateTimeZone;
 use Statamic\Support\Str;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
@@ -275,7 +274,7 @@ class StarterKitPostInstall
         $timezone = search(
             'App timezone?',
             options: function (string $value) {
-                $timezones = timezone_identifiers_list(DateTimeZone::ALL);
+                $timezones = timezone_identifiers_list(\DateTimeZone::ALL);
                 
                 if (!$value) {
                     return $timezones;
