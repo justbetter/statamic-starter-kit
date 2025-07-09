@@ -17,7 +17,6 @@ export_paths:
   - resources/views/components
   - resources/sites.yaml
   - database/migrations
-  - public/build
   - package.json
   - vite.config.js
 dependencies:
