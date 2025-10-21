@@ -16,6 +16,7 @@ class StarterKitPostInstall
     protected string $env = '';
     protected string $app = '';
     protected string $sites = '';
+    protected bool $rapidezStatamic = false;
 
     public function handle(): void
     {
@@ -54,7 +55,7 @@ class StarterKitPostInstall
                 'statamic/seo-pro' => 'Statamic SEO Pro',
                 'none' => 'None',
             ],
-            'withcandour/aardvark-seo'
+            'none'
         );
 
         if ($seoAddon !== 'none') {
@@ -71,7 +72,7 @@ class StarterKitPostInstall
                 'justbetter/statamic-cloudflare-purge' => 'Cloudflare Purge',
                 'none' => 'None',
             ],
-            'justbetter/statamic-cloudflare-purge'
+            'none'
         );
 
         if ($cacheAddon !== 'none') {
@@ -84,7 +85,7 @@ class StarterKitPostInstall
                 'justbetter/statamic-structured-data' => 'Structured Data',
                 'none' => 'None',
             ],
-            'justbetter/statamic-structured-data'
+            'none'
         );
 
         if ($structuredDataAddon !== 'none') {
@@ -107,6 +108,8 @@ class StarterKitPostInstall
 
     protected function setupRapidezStatamic(): void
     {
+        $this->rapidezStatamic = true;
+        
         info('⚡ Setting up Rapidez Statamic...');
         
         $this->runCommand('php artisan statamic:install', 'Installing Statamic...');
@@ -140,7 +143,7 @@ class StarterKitPostInstall
 
     protected function configureProject(): void
     {
-        if (!confirm('Do you want to configure your project settings?', true)) {
+        if ($this->rapidezStatamic || !confirm('Do you want to configure your project settings?', true)) {
             return;
         }
 
@@ -202,7 +205,7 @@ class StarterKitPostInstall
 
     protected function setupMultisite(): void
     {
-        if (confirm('Would you like to configure multisite? (Requires Statamic PRO license)', false)) {
+        if (!$this->rapidezStatamic && confirm('Would you like to configure multisite? (Requires Statamic PRO license)', false)) {
             $this->runCommand('php artisan statamic:multisite', 'Setting up multisite...');
         }
     }
