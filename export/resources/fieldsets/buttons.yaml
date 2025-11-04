@@ -1,0 +1,53 @@
+title: Buttons
+fields:
+  -
+    handle: buttons
+    field:
+      type: group
+      display: Buttons
+      border: false
+      fields:
+        -
+          handle: buttons
+          field:
+            button_label: 'Button toevoegen'
+            type: replicator
+            display: Button
+            hide_display: true
+            replicator_preview: false
+            collapse: true
+            sets:
+              buttons:
+                display: Buttons
+                sets:
+                  buttons:
+                    display: Buttons
+                    fields:
+                      -
+                        handle: button_text
+                        field:
+                          type: text
+                          display: 'Button tekst'
+                          width: 50
+                      -
+                        handle: button_variant
+                        field:
+                          options:
+                            -
+                              key: primary
+                              value: 'Primair (Kleur)'
+                            -
+                              key: secondary
+                              value: 'Secundair (Kleur)'
+                            -
+                              key: outline
+                              value: 'Omlijnd (Outline)'
+                          default: primary
+                          type: select
+                          display: 'Button variant'
+                          width: 50
+                      -
+                        handle: button_link
+                        field:
+                          type: link
+                          display: 'Button link'

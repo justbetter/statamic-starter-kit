@@ -1,0 +1,39 @@
+title: Content
+fields:
+  -
+    handle: content
+    field:
+      type: group
+      display: Content
+      hide_display: true
+      fullscreen: false
+      border: false
+      fields:
+        -
+          handle: content
+          field:
+            buttons:
+              - h1
+              - h2
+              - h3
+              - h4
+              - h5
+              - h6
+              - bold
+              - italic
+              - anchor
+              - unorderedlist
+              - orderedlist
+            remove_empty_nodes: true
+            type: bard
+            display: Content
+            sets:
+              buttons:
+                display: Buttons
+                sets:
+                  buttons:
+                    display: Buttons
+                    fields:
+                      -
+                        handle: buttons
+                        field: buttons.buttons

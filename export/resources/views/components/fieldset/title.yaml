@@ -1,0 +1,73 @@
+title: Titel
+fields:
+  -
+    handle: title
+    field:
+      type: group
+      display: Titel
+      border: false
+      hide_display: true
+      fullscreen: false
+      fields:
+        -
+          handle: title_text
+          field:
+            type: text
+            display: 'Titel tekst'
+            width: 66
+        -
+          handle: options
+          field:
+            type: toggle
+            display: 'Titel opties'
+            always_save: false
+            width: 33
+        -
+          handle: title_options
+          field:
+            type: group
+            display: 'Titel opties'
+            always_save: true
+            if:
+              options: 'equals true'
+            fields:
+              -
+                handle: heading_type
+                field:
+                  options:
+                    -
+                      key: h1
+                      value: H1
+                    -
+                      key: h2
+                      value: H2
+                    -
+                      key: h3
+                      value: H3
+                    -
+                      key: h4
+                      value: H4
+                    -
+                      key: h5
+                      value: H5
+                    -
+                      key: h6
+                      value: H6
+                    -
+                      key: div
+                      value: Div
+                  default: div
+                  type: select
+                  display: 'Kop type'
+                  width: 50
+              -
+                handle: variant
+                field:
+                  options:
+                    -
+                      key: default
+                      value: 'Normaal (default)'
+                  default: normal
+                  type: select
+                  display: Variant
+                  width: 50
