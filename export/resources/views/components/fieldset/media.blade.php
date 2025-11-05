@@ -1,6 +1,6 @@
 @props(['media' => false])
 
-@if($media && isset($media['media']))
+@if($media && $media['media'])
     @php
         $object_cover = optionalDeep($media)->media_options['object_fit']->value()->get() === 'cover';
 

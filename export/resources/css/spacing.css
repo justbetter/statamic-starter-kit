@@ -1,13 +1,3 @@
-.component {
-    + .component {
-        @apply mt-15 lg:mt-30;
-    }
-
-    &:first-child {
-        @apply mt-15 lg:mt-20;
-    }
-
-    &:last-child {
-        @apply mb-20 lg:mb-30;
-    }
+.fieldset-content + .fieldset-content {
+    @apply mt-6;
 }

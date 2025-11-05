@@ -1,11 +1,15 @@
 @props(['title' => false])
 
-@if($title && isset($title['title_text']))
+@if($title && $title['title_text'])
+    @php
+        $component = match($title->title_options['variant']?->value()) {
+            default => 'title.default'
+        };
+    @endphp
+
     <x-dynamic-component
         :$attributes
-        :component="[
-            'default' => 'title.default'
-        ][$title['variant']] ?? 'title.default'"
+        :$component
     >
         {{ $title['title_text'] }}
     </x-dynamic-component>
