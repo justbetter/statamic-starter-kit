@@ -3,24 +3,8 @@
 
 @if(is_iterable($buttons) && count($buttons['buttons']))
     <x-button.wrapper {{ $attributes }}>
-        @foreach($buttons['buttons'] as $content)
-            @if (($content['button_text'] ?? false) && ($content['button_link'] ?? false))
-                @php
-                    $component = match($content['button_variant']->value()) {
-                        default => 'button.primary',
-                        'secondary' => 'button.secondary',
-                        'outline' => 'button.outline'  
-                    };
-                @endphp
-
-                <x-dynamic-component
-                    :attributes="$button->attributes"
-                    :href="$content['button_link']"
-                    :$component
-                >
-                    {{ $content['button_text'] }}
-                </x-dynamic-component>
-            @endif
+        @foreach($buttons['buttons'] as $item)
+            <x-fieldset.button :button="$item['button']" :attributes="$button->attributes" />
         @endforeach
     </x-button.wrapper>
 @endif

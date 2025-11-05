@@ -35,5 +35,4 @@ fields:
                     display: Buttons
                     fields:
                       -
-                        handle: buttons
-                        field: buttons.buttons
+                        import: buttons
