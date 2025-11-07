@@ -2,10 +2,10 @@
 
 @if($media && $media['media'])
     @php
-        $object_cover = optionalDeep($media)->media_options['object_fit']->value()->get() === 'cover';
+        $objectCover = optionalDeep($media)->media_options['object_fit']->value()->get() === 'cover';
 
         $classes = $attributes->twMerge(
-            $object_cover ? 'object-cover w-full h-full' : 'object-contain w-auto! h-auto!'
+            $objectCover ? 'object-cover w-full h-full' : 'object-contain w-auto! h-auto!'
         );
     @endphp
 
