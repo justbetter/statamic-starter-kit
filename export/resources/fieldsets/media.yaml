@@ -18,7 +18,7 @@ fields:
             max_files: 1
             width: 66
         -
-          handle: settings
+          handle: options
           field:
             type: toggle
             display: 'Media opties'
@@ -28,9 +28,9 @@ fields:
           field:
             type: group
             display: 'Media opties'
-            if:
-              settings: 'equals true'
             always_save: true
+            if:
+              options: 'equals true'
             fields:
               -
                 handle: object_fit
