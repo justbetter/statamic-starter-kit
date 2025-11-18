@@ -1,10 +1,10 @@
-title: Titel
+title: Title
 fields:
   -
     handle: title
     field:
       type: group
-      display: Titel
+      display: Title
       border: false
       hide_display: true
       fullscreen: false
@@ -13,20 +13,20 @@ fields:
           handle: title_text
           field:
             type: text
-            display: 'Titel tekst'
+            display: 'Title text'
             width: 66
         -
           handle: options
           field:
             type: toggle
-            display: 'Titel opties'
+            display: 'Title options'
             always_save: false
             width: 33
         -
           handle: title_options
           field:
             type: group
-            display: 'Titel opties'
+            display: 'Title options'
             always_save: true
             if:
               options: 'equals true'
@@ -58,7 +58,7 @@ fields:
                       value: Div
                   default: div
                   type: select
-                  display: 'Kop type'
+                  display: 'Heading type'
                   width: 50
               -
                 handle: variant
@@ -66,7 +66,7 @@ fields:
                   options:
                     -
                       key: default
-                      value: 'Normaal (default)'
+                      value: 'Normal (default)'
                   default: default
                   type: select
                   display: Variant

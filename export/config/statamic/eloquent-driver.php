@@ -17,9 +17,9 @@ return [
     ],
 
     'blueprints' => [
-        'driver' => 'file',
+        'driver' => 'eloquent',
         'model' => \Statamic\Eloquent\Fields\BlueprintModel::class,
-        'namespaces' => 'all',
+        'namespaces' => ['forms'],
     ],
 
     'collections' => [

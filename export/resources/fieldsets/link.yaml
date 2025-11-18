@@ -21,14 +21,14 @@ fields:
           handle: options
           field:
             type: toggle
-            display: 'Link opties'
+            display: 'Link options'
             width: 33
             always_save: false
         -
           handle: link_options
           field:
             type: group
-            display: 'Link opties'
+            display: 'Link options'
             always_save: true
             if:
               options: 'equals true'
@@ -37,18 +37,18 @@ fields:
                 handle: blank
                 field:
                   type: toggle
-                  display: 'Openen in nieuw tabblad'
+                  display: 'Open in new tab'
                   width: 50
               -
                 handle: rel
                 field:
                   type: select
-                  display: 'Rel attribuut'
+                  display: 'Rel attribute'
                   width: 50
                   options:
                     -
                       key: null
-                      value: 'Geen rel'
+                      value: 'No rel'
                     -
                       key: nofollow
                       value: No-Follow
