@@ -67,7 +67,7 @@ fields:
                     -
                       key: default
                       value: 'Normaal (default)'
-                  default: normal
+                  default: default
                   type: select
                   display: Variant
                   width: 50
