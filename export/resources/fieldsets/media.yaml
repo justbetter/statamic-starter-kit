@@ -1,0 +1,68 @@
+title: Media
+fields:
+  -
+    handle: media
+    field:
+      type: group
+      display: Media
+      hide_display: true
+      border: false
+      fullscreen: false
+      fields:
+        -
+          handle: media
+          field:
+            container: assets
+            type: assets
+            display: Media
+            max_files: 1
+            width: 66
+        -
+          handle: options
+          field:
+            type: toggle
+            display: 'Media options'
+            width: 33
+        -
+          handle: media_options
+          field:
+            type: group
+            display: 'Media options'
+            always_save: true
+            if:
+              options: 'equals true'
+            fields:
+              -
+                handle: object_fit
+                field:
+                  options:
+                    -
+                      key: cover
+                      value: null
+                    -
+                      key: contain
+                      value: null
+                  type: select
+                  display: 'Object fit'
+                  default: cover
+              -
+                handle: video
+                field:
+                  options:
+                    -
+                      key: 'autoplay playsinline'
+                      value: 'Autoplay'
+                    -
+                      key: muted
+                      value: 'Muted by default'
+                    -
+                      key: loop
+                      value: 'Loop'
+                    -
+                      key: controls
+                      value: Controls
+                  multiple: true
+                  type: select
+                  display: Video
+                  placeholder: 'Select options...'
+                  default: controls

@@ -1,0 +1,35 @@
+title: Button
+fields:
+  -
+    handle: button
+    field:
+      type: group
+      display: Button
+      fullscreen: false
+      border: false
+      fields:
+        -
+          handle: button_text
+          field:
+            type: text
+            display: 'Button text'
+            width: 50
+        -
+          handle: button_variant
+          field:
+            options:
+              -
+                key: primary
+                value: 'Primary (Color)'
+              -
+                key: secondary
+                value: 'Secondary (Color)'
+              -
+                key: outline
+                value: 'Outlined (Outline)'
+            default: primary
+            type: select
+            display: 'Button variant'
+            width: 50
+        -
+          import: link

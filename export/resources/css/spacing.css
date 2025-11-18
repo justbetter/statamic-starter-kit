@@ -1,0 +1,3 @@
+.fieldset-content + .fieldset-content {
+    @apply mt-6;
+}

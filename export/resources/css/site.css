@@ -1,4 +1,7 @@
 @import "tailwindcss";
-@plugin "@tailwindcss/typography";
+@import "./prose";
+
 @source "../views";
 @source "../../content";
+
+@plugin "@tailwindcss/typography";

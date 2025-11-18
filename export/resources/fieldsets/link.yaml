@@ -1,0 +1,65 @@
+title: Link
+fields:
+  -
+    handle: link
+    field:
+      type: group
+      display: Link
+      hide_display: true
+      fullscreen: false
+      border: false
+      fields:
+        -
+          handle: link
+          field:
+            collections:
+              - pages
+            type: link
+            display: Link
+            width: 66
+        -
+          handle: options
+          field:
+            type: toggle
+            display: 'Link options'
+            width: 33
+            always_save: false
+        -
+          handle: link_options
+          field:
+            type: group
+            display: 'Link options'
+            always_save: true
+            if:
+              options: 'equals true'
+            fields:
+              -
+                handle: blank
+                field:
+                  type: toggle
+                  display: 'Open in new tab'
+                  width: 50
+              -
+                handle: rel
+                field:
+                  type: select
+                  display: 'Rel attribute'
+                  width: 50
+                  options:
+                    -
+                      key: null
+                      value: 'No rel'
+                    -
+                      key: nofollow
+                      value: No-Follow
+                    -
+                      key: noopener
+                      value: No-Opener
+                    -
+                      key: noreferrer
+                      value: No-Referrer
+              -
+                handle: aria_label
+                field:
+                  type: text
+                  display: 'Aria Label'

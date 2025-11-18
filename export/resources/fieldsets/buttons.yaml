@@ -1,0 +1,27 @@
+title: Buttons
+fields:
+  -
+    handle: buttons
+    field:
+      type: group
+      display: Buttons
+      border: false
+      fields:
+        -
+          handle: buttons
+          field:
+            button_label: 'Add button'
+            type: replicator
+            display: Button
+            hide_display: true
+            replicator_preview: false
+            collapse: true
+            sets:
+              buttons:
+                display: Buttons
+                sets:
+                  buttons:
+                    display: Buttons
+                    fields:
+                      -
+                        import: button
