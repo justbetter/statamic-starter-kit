@@ -27,9 +27,7 @@
         >
             <div class="bg py-18 px-24 max-lg:py-12 max-lg:px-14 max-sm:px-8">
                 @if($title)
-                    <div class="text-2xl mb-9 font-medium">
-                        {!! $title !!}
-                    </div>
+                    <x-fieldset.title :$title />
                 @endif
                 @if ($submissionText)
                     <div x-cloak x-show="showSuccess">
@@ -78,9 +76,9 @@
                 </div>
                 <div x-show="!showSuccess" class="md:flex md:flex-wrap md:items-center md:justify-between mt-11 max-sm:mt-5">
                     <div class="flex flex-wrap">
-                        <x-button.dynamic type="submit" class="w-full!">
+                        <x-button.primary type="submit" class="w-full!">
                             {{ $buttonText }}
-                        </x-button.dynamic>
+                        </x-button.primary>
                     </div>
                 </div>
             </div>

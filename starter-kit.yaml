@@ -12,7 +12,9 @@ export_paths:
   - resources/blueprints
   - resources/fieldsets
   - resources/css/site.css
+  - resources/js
   - resources/views/page.blade.php
+  - resources/views/page_builder.blade.php
   - resources/views/layouts/app.blade.php
   - resources/views/components
   - resources/sites.yaml
