@@ -22,5 +22,6 @@ export_paths:
   - lang/nl.json
 dependencies:
   justbetter/statamic-glide-directive: ^2.6
+  rapidez/blade-components: ^1.11
   rapidez/blade-directives: ^1.1
   statamic/eloquent-driver: ^4.21

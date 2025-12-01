@@ -1,0 +1,43 @@
+title: 'Component - FAQ'
+fields:
+  -
+    import: title
+  -
+    import: buttons
+  -
+    handle: faq_type
+    field:
+      options:
+        -
+          key: category
+          value: Category
+        -
+          key: manual
+          value: Manual
+      default: category
+      type: select
+      display: 'Faq - Type'
+      instructions: 'Choose whether the frequently asked questions are loaded based on categories or manually selected.'
+      localizable: true
+  -
+    handle: faq_categories
+    field:
+      create: false
+      taxonomies:
+        - faq_category
+      type: terms
+      display: Categories
+      localizable: true
+      if:
+        faq_type: 'equals category'
+  -
+    handle: faq_items
+    field:
+      create: false
+      collections:
+        - faq
+      type: entries
+      display: 'Frequently asked questions'
+      localizable: true
+      if:
+        faq_type: 'equals manual'

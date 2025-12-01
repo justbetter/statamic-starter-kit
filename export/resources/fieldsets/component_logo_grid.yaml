@@ -1,0 +1,25 @@
+title: 'Component - Logo Grid'
+fields:
+  -
+    handle: logos
+    field:
+      collapse: true
+      max_sets: 8
+      type: replicator
+      display: Logos
+      localizable: false
+      sets:
+        extra_logo:
+          display: 'Extra logo'
+          sets:
+            logo:
+              display: Logo
+              fields:
+                -
+                  handle: logo
+                  field:
+                    max_files: 1
+                    container: assets
+                    type: assets
+                    display: Logo
+                    localizable: false
