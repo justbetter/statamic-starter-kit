@@ -26,9 +26,7 @@
             data-generic-error="{{ __('Something went wrong. Please try again later.') }}"
         >
             <div class="bg py-18 px-24 max-lg:py-12 max-lg:px-14 max-sm:px-8">
-                @if($title)
-                    <x-fieldset.title :$title />
-                @endif
+                <x-fieldset.title :$title />
                 @if ($submissionText)
                     <div x-cloak x-show="showSuccess">
                         {!! $submissionText !!}
