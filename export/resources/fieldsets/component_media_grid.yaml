@@ -1,0 +1,19 @@
+title: 'Component - Media Grid'
+fields:
+  -
+    handle: media_items
+    field:
+      collapse: true
+      max_sets: 8
+      type: replicator
+      display: 'Media items'
+      localizable: false
+      sets:
+        extra_image:
+          display: 'Extra media'
+          sets:
+            image:
+              display: Media
+              fields:
+                -
+                  import: media
