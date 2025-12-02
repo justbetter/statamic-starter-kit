@@ -22,12 +22,12 @@ class StarterKitPostInstall
     {
         info('🚀 Setting up your JustBetter Statamic starter kit...');
         
-        $this->installDependencies();
-        
         if (confirm('Do you want to setup for a Rapidez Statamic project?', false)) {
             $this->setupRapidezStatamic();
         }
-        
+
+        $this->setupFiles();
+        $this->installDependencies();
         $this->configureProject();
         $this->setupDatabase();
         $this->setupMultisite();
@@ -35,12 +35,27 @@ class StarterKitPostInstall
         info('✅ Starter kit installation completed!');
     }
 
-    protected function installDependencies(): void
+    protected function setupFiles(): void
+    {
+        if ($this->rapidezStatamic) {
+            File::delete(base_path('resources/js/cp.js'));
+            File::delete(base_path('resources/js/site.js'));
+            File::delete(base_path('resources/js/components/formSubmit.js'));
+            File::delete(base_path('resources/views/components/form-fields'));
+            File::delete(base_path('resources/views/components/form'));
+        }
+    }
+
+    protected function installDependencies(): void  
     {
         $addons = $this->selectAddons();
         
         if (!empty($addons)) {
             $this->runCommand('composer require ' . implode(' ', $addons), 'Installing selected addons...');
+        }
+
+        if ($this->rapidezStatamic) {
+            $this->runCommand('yarn remove alpinejs async-alpine');
         }
     }
 

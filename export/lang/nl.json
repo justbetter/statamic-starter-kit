@@ -19,5 +19,21 @@
     "Muted by default": "Standaard gedempt",
     "Loop": "Automatisch herhalen",
     "Controls": "Bedieningsknoppen",
-    "Select options...": "Selecteer opties..."
+    "Select options...": "Selecteer opties...",
+    "Category": "Categorie",
+    "Manual": "Handmatig",
+    "Choose whether the frequently asked questions are loaded based on categories or manually selected.": "Kies hier of de veelgestelde vragen worden ingeladen obv categorieën of handmatig geselecteerd.",
+    "Categories": "Categorieën",
+    "Frequently asked questions": "Veelgestelde vragen",
+    "Mirror": "Spiegelen",
+    "Switch the position of the image with the text": "Wissel de positie van de afbeelding met de tekst",
+    "Add background color": "Achtergrond kleur toevoegen",
+    "Add a background color": "Voeg een achtergrond kleur toe",
+    "Form": "Formulier",
+    "Form - Submission text": "Formulier - Aanvraag verzonden tekst",
+    "Form - Redirect URL": "Formulier - Redirect URL",
+    "Leave empty to only show text after submitting the form.": "Laat leeg om alleen een tekst te tonen na het inzenden van het formulier.",
+    "Show sidebar content": "Toon sidebar content",
+    "Image": "Afbeelding",
+    "Text": "Tekst"
 }

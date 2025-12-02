@@ -12,7 +12,9 @@ export_paths:
   - resources/blueprints
   - resources/fieldsets
   - resources/css/site.css
+  - resources/js
   - resources/views/page.blade.php
+  - resources/views/page_builder.blade.php
   - resources/views/layouts/app.blade.php
   - resources/views/components
   - resources/sites.yaml
@@ -22,5 +24,6 @@ export_paths:
   - lang/nl.json
 dependencies:
   justbetter/statamic-glide-directive: ^2.6
+  rapidez/blade-components: ^1.11
   rapidez/blade-directives: ^1.1
   statamic/eloquent-driver: ^4.21
