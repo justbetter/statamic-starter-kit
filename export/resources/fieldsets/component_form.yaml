@@ -43,7 +43,7 @@ fields:
       display: 'Form - Submission text'
       localizable: true
   -
-    handle: form_redirect_url
+    handle: redirect_url
     field:
       collections:
         - pages
