@@ -5,7 +5,7 @@
         $objectCover = optionalDeep($media)->media_options['object_fit']->value()->get() === 'cover';
 
         $classes = $attributes->twMerge(
-            $objectCover ? '**:object-cover **:size-full' : 'w-auto! h-auto!'
+            $objectCover ? '**:object-cover **:size-full' : 'size-auto!'
         );
     @endphp
     
