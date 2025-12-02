@@ -39,12 +39,10 @@ class StarterKitPostInstall
     {
         if ($this->rapidezStatamic) {
             File::delete(base_path('resources/js/cp.js'));
-            File::delete(base_path('resources/js/site-standalone.js'));
+            File::delete(base_path('resources/js/site.js'));
             File::delete(base_path('resources/js/components/formSubmit.js'));
             File::delete(base_path('resources/views/components/form-fields'));
             File::delete(base_path('resources/views/components/form'));
-        } else {
-            File::move(base_path('resources/js/site-standalone.js'), base_path('resources/js/site.js'));
         }
     }
 
@@ -56,8 +54,8 @@ class StarterKitPostInstall
             $this->runCommand('composer require ' . implode(' ', $addons), 'Installing selected addons...');
         }
 
-        if (!$this->rapidezStatamic) {
-            $this->runCommand('yarn add -D alpinejs async-alpine');
+        if ($this->rapidezStatamic) {
+            $this->runCommand('yarn remove alpinejs async-alpine');
         }
     }
 
