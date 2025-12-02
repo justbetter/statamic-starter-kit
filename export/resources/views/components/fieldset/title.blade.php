@@ -8,7 +8,7 @@
     @endphp
 
     <x-dynamic-component
-        :tag="$title->title_options['heading_type']->value()"
+        :tag="$title->title_options['heading_type']->value() ?? 'div'"
         :$attributes
         :$component
     >
