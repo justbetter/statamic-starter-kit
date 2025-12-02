@@ -21,13 +21,13 @@ fields:
           handle: options
           field:
             type: toggle
-            display: 'Media opties'
+            display: 'Media options'
             width: 33
         -
           handle: media_options
           field:
             type: group
-            display: 'Media opties'
+            display: 'Media options'
             always_save: true
             if:
               options: 'equals true'
@@ -51,18 +51,18 @@ fields:
                   options:
                     -
                       key: 'autoplay playsinline'
-                      value: 'Automatisch afspelen'
+                      value: 'Autoplay'
                     -
                       key: muted
-                      value: 'Standaard gedempt'
+                      value: 'Muted by default'
                     -
                       key: loop
-                      value: 'Automatisch herhalen'
+                      value: 'Loop'
                     -
                       key: controls
-                      value: Bedieningsknoppen
+                      value: Controls
                   multiple: true
                   type: select
                   display: Video
-                  placeholder: 'Selecteer opties...'
+                  placeholder: 'Select options...'
                   default: controls

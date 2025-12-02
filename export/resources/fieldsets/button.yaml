@@ -12,7 +12,7 @@ fields:
           handle: button_text
           field:
             type: text
-            display: 'Button tekst'
+            display: 'Button text'
             width: 50
         -
           handle: button_variant
@@ -20,13 +20,13 @@ fields:
             options:
               -
                 key: primary
-                value: 'Primair (Kleur)'
+                value: 'Primary (Color)'
               -
                 key: secondary
-                value: 'Secundair (Kleur)'
+                value: 'Secondary (Color)'
               -
                 key: outline
-                value: 'Omlijnd (Outline)'
+                value: 'Outlined (Outline)'
             default: primary
             type: select
             display: 'Button variant'

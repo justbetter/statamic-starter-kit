@@ -10,7 +10,7 @@ fields:
         -
           handle: buttons
           field:
-            button_label: 'Button toevoegen'
+            button_label: 'Add button'
             type: replicator
             display: Button
             hide_display: true

@@ -1,0 +1,23 @@
+{
+    "Title": "Titel",
+    "Title text": "Titel tekst",
+    "Title options": "Titel opties",
+    "Heading type": "Kop type",
+    "Normal (default)": "Normaal (default)",
+    "Variant": "Variant",
+    "Button text": "Button tekst",
+    "Primary (Color)": "Primair (Kleur)",
+    "Secondary (Color)": "Secundair (Kleur)",
+    "Outlined (Outline)": "Omlijnd (Outline)",
+    "Add button": "Button toevoegen",
+    "Link options": "Link opties",
+    "Open in new tab": "Openen in nieuw tabblad",
+    "Rel attribute": "Rel attribuut",
+    "No rel": "Geen rel",
+    "Media options": "Media opties",
+    "Autoplay": "Automatisch afspelen",
+    "Muted by default": "Standaard gedempt",
+    "Loop": "Automatisch herhalen",
+    "Controls": "Bedieningsknoppen",
+    "Select options...": "Selecteer opties..."
+}

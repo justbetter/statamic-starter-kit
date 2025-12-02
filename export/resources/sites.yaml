@@ -1,4 +1,5 @@
 default:
   name: '{{ config:app:name }}'
   locale: nl_NL
+  lang: nl
   url: '{{ config:statamic:system.urls.default }}'
