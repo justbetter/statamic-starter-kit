@@ -8,7 +8,7 @@
             $objectCover ? '**:object-cover **:size-full' : 'w-auto! h-auto!'
         );
     @endphp
-    
+
     <div {{ $classes }}>
         @if ($media['media']->isVideo())
             <video
@@ -16,7 +16,7 @@
                     {{ $option['value'] }}
                 @endforeach
             >
-                <source src="{{ $media }}" type="video/mp4">
+                <source src="{{ $media['media'] }}" type="video/mp4">
             </video>
         @else
             @responsive($media['media'])
