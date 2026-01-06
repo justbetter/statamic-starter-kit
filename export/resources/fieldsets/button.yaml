@@ -7,13 +7,8 @@ fields:
       display: Button
       fullscreen: false
       border: false
+      localizable: false
       fields:
-        -
-          handle: button_text
-          field:
-            type: text
-            display: 'Button text'
-            width: 50
         -
           handle: button_variant
           field:
@@ -30,6 +25,53 @@ fields:
             default: primary
             type: select
             display: 'Button variant'
-            width: 50
+            localizable: false
+        -
+          handle: button_text
+          field:
+            type: text
+            display: 'Button text'
+            width: 66
+            localizable: false
+        -
+          handle: options
+          field:
+            type: toggle
+            display: 'Knop opties'
+            localizable: false
+            width: 33
+        -
+          handle: button_options
+          field:
+            type: group
+            display: 'Button options'
+            localizable: false
+            if:
+              options: 'equals true'
+            fields:
+              -
+                handle: icon
+                field:
+                  max_files: 1
+                  container: icons
+                  type: assets
+                  display: Icon
+                  localizable: false
+                  width: 66
+              -
+                handle: icon_position
+                field:
+                  options:
+                    -
+                      key: left
+                      value: Left
+                    -
+                      key: right
+                      value: Right
+                  default: right
+                  type: select
+                  display: 'Icon position'
+                  localizable: false
+                  width: 33
         -
           import: link

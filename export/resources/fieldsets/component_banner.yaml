@@ -1,0 +1,39 @@
+title: 'Component - Banner'
+fields:
+  -
+    handle: display
+    field:
+      options:
+        -
+          key: container
+          value: 'In container'
+        -
+          key: desktop_container
+          value: 'Desktop only container'
+        -
+          key: full_width
+          value: Fullscreen
+      type: select
+      display: Display
+      default: full_width
+      localizable: false
+      width: 50
+  -
+    handle: size
+    field:
+      options:
+        -
+          key: compact
+          value: Compact
+        -
+          key: normal
+          value: Normal
+      type: select
+      display: Size
+      default: normal
+      localizable: false
+      width: 50
+  -
+    import: media
+  -
+    import: link

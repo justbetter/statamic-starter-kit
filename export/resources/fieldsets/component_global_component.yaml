@@ -1,0 +1,12 @@
+title: 'Component - Global Component'
+fields:
+  -
+    handle: global_component
+    field:
+      max_items: 1
+      create: false
+      collections:
+        - global_components
+      type: entries
+      display: 'Global Component'
+      localizable: false

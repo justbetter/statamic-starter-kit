@@ -8,6 +8,7 @@ fields:
       hide_display: true
       fullscreen: false
       border: false
+      localizable: false
       fields:
         -
           handle: link
@@ -17,6 +18,8 @@ fields:
             type: link
             display: Link
             width: 66
+            localizable: false
+            container: assets
         -
           handle: options
           field:
@@ -24,6 +27,7 @@ fields:
             display: 'Link options'
             width: 33
             always_save: false
+            localizable: false
         -
           handle: link_options
           field:
@@ -32,6 +36,7 @@ fields:
             always_save: true
             if:
               options: 'equals true'
+            localizable: false
             fields:
               -
                 handle: blank
@@ -39,6 +44,7 @@ fields:
                   type: toggle
                   display: 'Open in new tab'
                   width: 50
+                  localizable: false
               -
                 handle: rel
                 field:
@@ -46,9 +52,6 @@ fields:
                   display: 'Rel attribute'
                   width: 50
                   options:
-                    -
-                      key: null
-                      value: 'No rel'
                     -
                       key: nofollow
                       value: No-Follow
@@ -58,8 +61,19 @@ fields:
                     -
                       key: noreferrer
                       value: No-Referrer
+                  localizable: false
+                  multiple: true
+              -
+                handle: download_attribute
+                field:
+                  type: toggle
+                  display: 'Download attribute'
+                  localizable: false
+                  width: 50
               -
                 handle: aria_label
                 field:
                   type: text
-                  display: 'Aria Label'
+                  display: 'Aria label'
+                  width: 50
+                  localizable: false

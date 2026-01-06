@@ -1,6 +1,8 @@
 /.phpunit.cache
 /node_modules
 /public/build
+/public/vendor
+/public/assets
 /public/hot
 /public/storage
 /public/vendor/statamic
@@ -23,3 +25,4 @@ yarn-error.log
 /.vscode
 /.zed
 /public/img
+/public/icons

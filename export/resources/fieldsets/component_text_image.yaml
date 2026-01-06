@@ -1,0 +1,22 @@
+title: 'Component - Text + Image'
+fields:
+  -
+    import: media
+  -
+    import: content
+  -
+    handle: toggle
+    field:
+      type: toggle
+      display: Mirror
+      instructions: 'Switch the position of the image with the text'
+      width: 50
+      localizable: false
+  -
+    handle: background
+    field:
+      type: toggle
+      display: 'Add background color'
+      instructions: 'Add a background color'
+      width: 50
+      localizable: false

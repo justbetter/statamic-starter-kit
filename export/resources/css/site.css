@@ -1,7 +1,117 @@
 @import "tailwindcss";
-@import "./prose";
+@import "./components/spacing";
+@import "./fonts";
+@import "./components/prose";
 
 @source "../views";
 @source "../../content";
 
 @plugin "@tailwindcss/typography";
+
+@custom-variant hover (&:hover);
+
+@theme {
+    --font-sans: system-ui, sans-serif;
+
+    --primary: #4951D5;
+    --primary-text: var(--color-white);
+    --primary-border: #4951D5;
+
+    --secondary: #1A1A1A;
+    --secondary-text: var(--color-white);
+
+    --foreground: #1A1A1A;
+    --foreground-muted: #60606C;
+
+    --border-emphasis: #1A1A1A;
+    --border: #CCCCCC;
+    --border-muted: #E0E0E0;
+
+    --background-emphasis: #1A1A1A;
+    --background: #F7F7F7;
+
+    --color-primary: var(--primary);
+    --color-primary-text: var(--primary-text);
+    --color-primary-border: var(--primary-border);
+
+    --color-secondary: var(--secondary);
+    --color-secondary-text: var(--secondary-text);
+
+    --color-conversion: var(--conversion);
+    --color-conversion-text: var(--conversion-text);
+    --color-conversion-border: var(--conversion-border);
+
+    --text-color-emphasis: var(--foreground-emphasis);
+    --text-color-default: var(--foreground);
+    --text-color-muted: var(--foreground-muted);
+
+    --border-color-emphasis: var(--border-emphasis);
+    --border-color-default: var(--border);
+    --border-color-muted: var(--border-muted);
+
+    --ring-color-emphasis: var(--border-emphasis);
+    --ring-color-default: var(--border);
+    --ring-color-muted: var(--border-muted);
+    --ring-color-active: var(--border-active);
+
+    --outline-color-emphasis: var(--border-emphasis);
+    --outline-color-default: var(--border);
+    --outline-color-muted: var(--border-muted);
+    --outline-color-active: var(--border-active);
+
+    --background-color-emphasis: var(--background-emphasis);
+    --background-color-default: var(--background);
+    --background-color-muted: var(--background-muted);
+
+    --color-success: #38C172;
+
+    --color-backdrop: rgba(26, 26, 26, .3);
+
+    --z-index-header: 100;
+
+    --z-index-notifications: 110;
+
+    --z-index-slideover: 120;
+    --z-index-slideover-overlay: 10;
+    --z-index-slideover-sidebar: 20;
+
+    --z-index-popup: 130;
+    --z-index-popup-actions: 10;
+
+    --z-index-cookie: 140;
+
+    --shadow-header: 0 2px 80px 0 rgba(0, 0, 0, 0.08);
+    --shadow-input: 0 2px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+@utility container {
+    @apply px-4 mx-auto;
+}
+
+@utility text {
+    color: var(--text-color-default);
+}
+
+@utility bg {
+    background-color: var(--background-color-default);
+}
+
+@utility border {
+    border-color: var(--border-color-default);
+}
+
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--border);
+    }
+
+    @supports (interpolate-size: allow-keywords) {
+        :root {
+            interpolate-size: allow-keywords;
+        }
+    }
+}
