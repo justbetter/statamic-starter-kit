@@ -23,7 +23,6 @@
         <x-layouts.header :logo="$brand->logo ?? null" />
         @yield('content')
         <x-layouts.footer :logo="$brand->logo ?? null" />
-        @includeIf('layouts.seo.footer')
         @vite('resources/js/site.js')
 
         @stack('foot')

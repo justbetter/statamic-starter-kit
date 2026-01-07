@@ -19,7 +19,7 @@ export_paths:
   - resources/js
   - resources/views/page.blade.php
   - resources/views/page_builder.blade.php
-  - resources/views/layouts/app.blade.php
+  - resources/views/layouts
   - resources/views/components
   - resources/views/mail
   - resources/views/page_builder
@@ -29,7 +29,7 @@ export_paths:
   - vite.config.js
   - lang/nl.json
 dependencies:
-  justbetter/statamic-glide-directive: ^2.6
+  justbetter/statamic-glide-directive: ^3.0
   rapidez/blade-components: ^1.11
   rapidez/blade-directives: ^1.1
-  statamic/eloquent-driver: ^4.21
+  statamic/eloquent-driver: ^4.35
