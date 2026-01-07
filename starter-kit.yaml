@@ -2,7 +2,10 @@ updatable: true
 export_paths:
   - .env.example
   - .gitignore
+  - app/Models/User.php
+  - app/Tags/Faq.php
   - content
+  - config/justbetter
   - config/filesystems.php
   - config/auth.php
   - config/statamic/users.php
@@ -12,12 +15,14 @@ export_paths:
   - config/statamic/forms.php
   - resources/blueprints
   - resources/fieldsets
-  - resources/css/site.css
+  - resources/css
   - resources/js
   - resources/views/page.blade.php
   - resources/views/page_builder.blade.php
   - resources/views/layouts/app.blade.php
   - resources/views/components
+  - resources/views/mail
+  - resources/views/page_builder
   - resources/sites.yaml
   - database/migrations
   - package.json

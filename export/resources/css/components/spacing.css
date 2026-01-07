@@ -1,0 +1,13 @@
+.fieldset-content + .fieldset-content {
+    @apply mt-6;
+}
+
+.component + .component {
+    @apply mt-10 lg:mt-20;
+}
+
+.component {
+    &.has-background {
+        @apply py-10 lg:py-20 bg;
+    }
+}

@@ -2,7 +2,7 @@
 
 return [
     'collections' => [
-        'pages'
+        'pages',
     ],
     'taxonomies' => [
         // Add taxonomy handles here that should have structured data objects
