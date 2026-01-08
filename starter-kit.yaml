@@ -10,6 +10,7 @@ export_paths:
   - config/auth.php
   - config/statamic/users.php
   - config/statamic/assets.php
+  - config/statamic/editions.php
   - config/statamic/eloquent-driver.php
   - config/statamic/system.php
   - config/statamic/forms.php
@@ -19,7 +20,7 @@ export_paths:
   - resources/js
   - resources/views/page.blade.php
   - resources/views/page_builder.blade.php
-  - resources/views/layouts
+  - resources/views/layouts/app.blade.php
   - resources/views/components
   - resources/views/mail
   - resources/views/page_builder
