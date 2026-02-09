@@ -1,7 +1,8 @@
 /* Remove huge whitespace in grouped replicators within the pagebuilder fieldset */
-#statamic .publish-fields .publish-field[class*="page_builder"] .group-fieldtype {
-    ~ div .group-fieldtype-container .replicator-fieldtype > .field-inner,
-    .replicator-set-container > div:first-child .replicator-set-picker {
+#statamic .publish-fields .publish-field[class*="page_builder"] {
+    .group-fieldtype ~ div .group-fieldtype-container .replicator-fieldtype > .field-inner,
+    .group-fieldtype .replicator-set-container > div:first-child .replicator-set-picker,
+    .field-inner:empty {
         display: none;
     }
 }

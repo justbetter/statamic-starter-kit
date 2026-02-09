@@ -46,6 +46,20 @@ fields:
                   display: 'Object fit'
                   default: cover
               -
+                handle: loading
+                field:
+                  options:
+                    -
+                      key: lazy
+                      value: 'Lazy loading'
+                    -
+                      key: eager
+                      value: 'Eager loading'
+                  type: select
+                  instructions: 'Lazy loading is the default and will load the image when it is visible in the viewport. Eager loading will load the image when the page loads.'
+                  display: 'Loading'
+                  default: lazy
+              -
                 handle: video
                 field:
                   options:

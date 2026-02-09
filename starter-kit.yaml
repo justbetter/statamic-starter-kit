@@ -2,25 +2,35 @@ updatable: true
 export_paths:
   - .env.example
   - .gitignore
+  - app/Models/User.php
+  - app/Tags/Faq.php
   - content
+  - config/justbetter
   - config/filesystems.php
   - config/auth.php
   - config/statamic/users.php
   - config/statamic/assets.php
+  - config/statamic/editions.php
   - config/statamic/eloquent-driver.php
   - config/statamic/system.php
+  - config/statamic/forms.php
   - resources/blueprints
   - resources/fieldsets
-  - resources/css/site.css
+  - resources/css
+  - resources/js
   - resources/views/page.blade.php
+  - resources/views/page_builder.blade.php
   - resources/views/layouts/app.blade.php
   - resources/views/components
+  - resources/views/mail
+  - resources/views/page_builder
   - resources/sites.yaml
   - database/migrations
   - package.json
   - vite.config.js
   - lang/nl.json
 dependencies:
-  justbetter/statamic-glide-directive: ^2.6
+  justbetter/statamic-glide-directive: ^3.0
+  rapidez/blade-components: ^1.11
   rapidez/blade-directives: ^1.1
-  statamic/eloquent-driver: ^4.21
+  statamic/eloquent-driver: ^4.35

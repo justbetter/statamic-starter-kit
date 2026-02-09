@@ -5,10 +5,49 @@ fields:
     field:
       type: replicator
       display: 'Page Builder'
+      localizable: true
+      collapse: true
       sets:
-        new_set_group:
-          display: 'New Set Group'
+        components:
+          display: Components
           sets:
-            new_set:
-              display: 'New Set'
-              fields: {  }
+            banner:
+              display: Banner
+              fields:
+                -
+                  import: component_banner
+            content:
+              display: Content
+              fields:
+                -
+                  import: component_content
+            text_image:
+              display: 'Text + image'
+              fields:
+                -
+                  import: component_text_image
+            faq:
+              display: FAQ
+              fields:
+                -
+                  import: component_faq
+            form:
+              display: Form
+              fields:
+                -
+                  import: component_form
+            logo_grid:
+              display: 'Logo grid'
+              fields:
+                -
+                  import: component_logo_grid
+            media_grid:
+              display: 'Media grid'
+              fields:
+                -
+                  import: component_media_grid
+            global_component:
+              display: 'Global component'
+              fields:
+                -
+                  import: component_global_component

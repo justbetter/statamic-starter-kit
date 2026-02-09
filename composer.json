@@ -18,12 +18,6 @@
             "role": "Developer"
         }
     ],
-    "repositories": [
-        {
-            "type": "path",
-            "url": "package"
-        }
-    ],
     "autoload": {
         "psr-4": {
             "JustBetter\\StatamicStarterKit\\": "src"

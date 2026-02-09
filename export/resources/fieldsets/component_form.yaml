@@ -1,0 +1,47 @@
+title: 'Component - Form'
+fields:
+  -
+    import: title
+  -
+    handle: anchor_id
+    field:
+      type: text
+      display: 'Anchor ID'
+      localizable: true
+  -
+    handle: form
+    field:
+      max_items: 1
+      display: Form
+      type: form
+      localizable: true
+  -
+    handle: button_text
+    field:
+      type: text
+      validate:
+        - required
+      localizable: true
+  -
+    handle: submission_text
+    field:
+      buttons:
+        - bold
+        - italic
+        - unorderedlist
+        - orderedlist
+        - removeformat
+        - anchor
+      remove_empty_nodes: false
+      type: bard
+      display: 'Form - Submission text'
+      localizable: true
+  -
+    handle: redirect_url
+    field:
+      collections:
+        - pages
+      type: link
+      display: 'Form - Redirect URL'
+      instructions: 'Leave empty to only show text after submitting the form.'
+      localizable: true

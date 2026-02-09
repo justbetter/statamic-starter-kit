@@ -51,7 +51,6 @@ class StarterKitPostInstall
         $seoAddon = select(
             'Which SEO addon do you want to use?',
             [
-                'withcandour/aardvark-seo' => 'Aardvark SEO',
                 'statamic/seo-pro' => 'Statamic SEO Pro',
                 'none' => 'None',
             ],
@@ -61,8 +60,8 @@ class StarterKitPostInstall
         if ($seoAddon !== 'none') {
             $addons[] = $seoAddon;
             
-            if ($seoAddon === 'withcandour/aardvark-seo') {
-                $this->copyAardvarkTemplates();
+            if ($seoAddon === 'statamic/seo-pro') {
+                $this->copySeoProTemplates();
             }
         }
 
@@ -95,14 +94,14 @@ class StarterKitPostInstall
         return $addons;
     }
 
-    protected function copyAardvarkTemplates(): void
+    protected function copySeoProTemplates(): void
     {
         $source = base_path('vendor/justbetter/statamic-starter-kit/export/resources/views/layouts/seo');
         $destination = base_path('resources/views/layouts/seo');
         
         if (File::exists($source)) {
             File::copyDirectory($source, $destination);
-            info('📁 Copied Aardvark SEO templates');
+            info('📁 Copied SEO Pro templates');
         }
     }
 
