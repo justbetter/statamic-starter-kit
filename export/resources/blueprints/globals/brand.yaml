@@ -11,3 +11,13 @@ tabs:
               container: assets
               type: assets
               display: Logo
+              localizable: true
+      -
+        display: 'Google Tag Manager'
+        fields:
+          -
+            handle: gtm_id
+            field:
+              type: text
+              display: 'Google Tag Manager ID'
+              localizable: false

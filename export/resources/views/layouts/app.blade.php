@@ -20,6 +20,7 @@
         @includeIf('layouts.structured-data.head')
     </head>
     <body class="flex flex-col antialiased font-sans text">
+        @includeIf('layouts.seo.body')
         <x-layouts.header :logo="$brand->logo ?? null" />
         @yield('content')
         <x-layouts.footer :logo="$brand->logo ?? null" />

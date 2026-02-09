@@ -24,6 +24,7 @@ export_paths:
   - resources/views/components
   - resources/views/mail
   - resources/views/page_builder
+  - resources/views/layouts/seo
   - resources/sites.yaml
   - database/migrations
   - package.json
