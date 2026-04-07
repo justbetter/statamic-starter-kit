@@ -8,6 +8,7 @@ fields:
       hide_display: true
       border: false
       fullscreen: false
+      localizable: false
       fields:
         -
           handle: media
@@ -17,11 +18,14 @@ fields:
             display: Media
             max_files: 1
             width: 66
+            localizable: false
         -
           handle: options
           field:
-            type: toggle
+            mode: toggle
+            type: revealer
             display: 'Media options'
+            localizable: false
             width: 33
         -
           handle: media_options
@@ -29,6 +33,7 @@ fields:
             type: group
             display: 'Media options'
             always_save: true
+            localizable: false
             if:
               options: 'equals true'
             fields:
@@ -45,6 +50,31 @@ fields:
                   type: select
                   display: 'Object fit'
                   default: cover
+                  localizable: false
+                  width: 50
+              -
+                handle: video
+                field:
+                  options:
+                    -
+                      key: 'autoplay playsinline'
+                      value: Autoplay
+                    -
+                      key: muted
+                      value: 'Muted by default'
+                    -
+                      key: loop
+                      value: Loop
+                    -
+                      key: controls
+                      value: Controls
+                  multiple: true
+                  type: select
+                  display: Video
+                  placeholder: 'Select options...'
+                  default: controls
+                  localizable: false
+                  width: 50
               -
                 handle: loading
                 field:
@@ -57,26 +87,6 @@ fields:
                       value: 'Eager loading'
                   type: select
                   instructions: 'Lazy loading is the default and will load the image when it is visible in the viewport. Eager loading will load the image when the page loads.'
-                  display: 'Loading'
+                  display: Loading
                   default: lazy
-              -
-                handle: video
-                field:
-                  options:
-                    -
-                      key: 'autoplay playsinline'
-                      value: 'Autoplay'
-                    -
-                      key: muted
-                      value: 'Muted by default'
-                    -
-                      key: loop
-                      value: 'Loop'
-                    -
-                      key: controls
-                      value: Controls
-                  multiple: true
-                  type: select
-                  display: Video
-                  placeholder: 'Select options...'
-                  default: controls
+                  localizable: false

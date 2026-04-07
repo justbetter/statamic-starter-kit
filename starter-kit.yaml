@@ -32,7 +32,7 @@ export_paths:
   - vite.config.js
   - lang/nl.json
 dependencies:
-  justbetter/statamic-glide-directive: ^3.0
+  justbetter/statamic-glide-directive: ^4.0
   rapidez/blade-components: ^1.11
   rapidez/blade-directives: ^1.1
-  statamic/eloquent-driver: ^4.35
+  statamic/eloquent-driver: ^5.0

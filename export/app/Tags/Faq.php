@@ -9,7 +9,7 @@ use Statamic\Tags\Tags;
 class Faq extends Tags
 {
     /**
-     * @return \Illuminate\Support\Collection<int, Entry>
+     * @return Collection<int, Entry>
      */
     public function getItems(): Collection
     {

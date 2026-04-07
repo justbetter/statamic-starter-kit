@@ -23,20 +23,20 @@ fields:
         -
           handle: options
           field:
-            type: toggle
+            mode: toggle
+            type: revealer
             display: 'Link options'
-            width: 33
-            always_save: false
             localizable: false
+            width: 33
         -
           handle: link_options
           field:
             type: group
             display: 'Link options'
             always_save: true
+            localizable: false
             if:
               options: 'equals true'
-            localizable: false
             fields:
               -
                 handle: blank

@@ -8,6 +8,7 @@ fields:
       border: false
       hide_display: true
       fullscreen: false
+      localizable: false
       fields:
         -
           handle: title_text
@@ -15,12 +16,14 @@ fields:
             type: text
             display: 'Title text'
             width: 66
+            localizable: false
         -
           handle: options
           field:
-            type: toggle
+            mode: toggle
+            type: revealer
             display: 'Title options'
-            always_save: false
+            localizable: false
             width: 33
         -
           handle: title_options
@@ -28,6 +31,7 @@ fields:
             type: group
             display: 'Title options'
             always_save: true
+            localizable: false
             if:
               options: 'equals true'
             fields:
@@ -60,6 +64,7 @@ fields:
                   type: select
                   display: 'Heading type'
                   width: 50
+                  localizable: false
               -
                 handle: variant
                 field:
@@ -71,3 +76,4 @@ fields:
                   type: select
                   display: Variant
                   width: 50
+                  localizable: false

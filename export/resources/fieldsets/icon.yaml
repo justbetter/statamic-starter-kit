@@ -1,0 +1,26 @@
+title: Icon
+fields:
+  -
+    handle: icon
+    field:
+      type: group
+      display: Icoon
+      localizable: false
+      border: false
+      hide_display: true
+      fields:
+        -
+          handle: icon
+          field:
+            directory: public/icons
+            type: icon
+            display: Icon
+            localizable: false
+            width: 50
+        -
+          handle: preserve_icon_color
+          field:
+            type: toggle
+            display: 'Preserve icon color'
+            localizable: false
+            width: 50

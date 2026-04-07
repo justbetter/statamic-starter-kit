@@ -5,7 +5,6 @@
         prose-ul:prose-li:*:before:check-icon prose-ul:prose-li:*:flex prose-li:mt-1.5 prose-ul:mt-3 prose-ol:mt-2.5 prose-ol:prose-li:list-decimal prose-ol:list-inside prose-ol:prose-p:inline-block
         prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-headings:text-lg prose-headings:first:text-4xl prose-headings:font-semibold 
         prose-a:underline prose-a:text-primary
-        max-w-3xl
         empty:hidden *:empty:hidden;
 } 
 

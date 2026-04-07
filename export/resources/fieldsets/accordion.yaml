@@ -1,0 +1,33 @@
+title: Accordion
+fields:
+  -
+    handle: accordion
+    field:
+      type: group
+      display: Accordion
+      localizable: false
+      fullscreen: false
+      border: false
+      fields:
+        -
+          handle: accordion
+          field:
+            type: replicator
+            display: Accordion
+            localizable: false
+            collapse: true
+            sets:
+              item:
+                display: Item
+                sets:
+                  item:
+                    display: Item
+                    fields:
+                      -
+                        handle: title
+                        field:
+                          type: text
+                          display: Title
+                          localizable: false
+                      -
+                        import: content
