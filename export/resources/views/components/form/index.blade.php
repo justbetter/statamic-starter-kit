@@ -72,7 +72,7 @@
                 </div>
                 <div x-show="!showSuccess" class="md:flex md:flex-wrap md:items-center md:justify-between mt-11 max-sm:mt-5">
                     <div class="flex flex-wrap">
-                        <x-button.primary type="submit" class="w-full!">
+                        <x-button.primary type="submit" class="w-full!" x-bind:disabled="loading">
                             {{ $buttonText }}
                         </x-button.primary>
                     </div>

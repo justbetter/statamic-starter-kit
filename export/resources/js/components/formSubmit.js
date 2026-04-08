@@ -5,6 +5,7 @@ export default () => ({
     formErrors: {},
     formResult: false,
     showSuccess: false,
+    loading: false,
 
     fieldHasError: function (field) {
         if (this.formErrors[field]) {
@@ -21,6 +22,12 @@ export default () => ({
     getResults: function (formElement, redirect) {
         let context = this;
         let data = new FormData(formElement);
+
+        if (context.loading) {
+            return;
+        }
+
+        context.loading = true;
 
         fetch(formElement.action, {
             method: formElement.method,
@@ -58,6 +65,9 @@ export default () => ({
             context.formErrors = { general: [formElement.dataset.genericError || 'Something went wrong. Please try again later.'] };
             context.formResult = { errors: context.formErrors };
             context.scrollToTop();
+        })
+        .finally(() => {
+            context.loading = false;
         });
     },
 });
