@@ -34,7 +34,7 @@ class StarterKitFormsController extends BaseFormsController
             $sections = $blueprintContents['tabs']['main']['sections'];
 
             foreach ($sections as $sectionIndex => $section) {
-                if (! is_array($section) || ($section['display'] ?? null) !== 'Email') {
+                if (! is_array($section)) {
                     continue;
                 }
 
