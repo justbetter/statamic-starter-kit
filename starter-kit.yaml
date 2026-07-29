@@ -18,6 +18,7 @@ export_paths:
   - resources/fieldsets
   - resources/css
   - resources/js
+  - resources/svg
   - resources/views/page.blade.php
   - resources/views/page_builder.blade.php
   - resources/views/layouts/app.blade.php
