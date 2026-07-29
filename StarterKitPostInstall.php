@@ -18,6 +18,17 @@ class StarterKitPostInstall
     protected string $sites = '';
     protected bool $rapidezStatamic = false;
 
+    /**
+     * Repositories that Multisite renames by site handle.
+     * File drivers derive locale from the current default site;
+     * Eloquent stores the handle permanently, so Multisite must run on files first.
+     */
+    protected array $multisiteFileDrivers = [
+        'collection_trees',
+        'navigation_trees',
+        'global_set_variables',
+    ];
+
     public function handle(): void
     {
         info('🚀 Setting up your JustBetter Statamic starter kit...');
@@ -31,6 +42,7 @@ class StarterKitPostInstall
         $this->configureProject();
         $this->setupDatabase();
         $this->setupMultisite();
+        $this->importEloquentContent();
         
         info('✅ Starter kit installation completed!');
     }
@@ -204,9 +216,43 @@ class StarterKitPostInstall
 
     protected function setupMultisite(): void
     {
-        if (!$this->rapidezStatamic && confirm('Would you like to configure multisite? (Requires Statamic PRO license)', false)) {
-            $this->runCommand('php artisan statamic:multisite', 'Setting up multisite...');
+        if ($this->rapidezStatamic || !confirm('Would you like to configure multisite? (Requires Statamic PRO license)', false)) {
+            return;
         }
+
+        // Multisite renames the default site handle, then looks up trees by that handle.
+        // File trees adapt via Site::default(); Eloquent trees keep the old handle and break.
+        $this->setDrivers($this->multisiteFileDrivers, 'file');
+        $this->runCommand('php artisan config:clear');
+        $this->runCommand('php artisan statamic:multisite', 'Setting up multisite...');
+        $this->setDrivers($this->multisiteFileDrivers, 'eloquent');
+        $this->runCommand('php artisan config:clear');
+    }
+
+    protected function importEloquentContent(): void
+    {
+        info('📦 Importing file content into Eloquent...');
+
+        $this->runCommand('php artisan statamic:eloquent:import-navs --force --only-nav-trees', 'Importing navigation trees...');
+        $this->runCommand('php artisan statamic:eloquent:import-collections --force --only-collection-trees', 'Importing collection trees...');
+        $this->runCommand('php artisan statamic:eloquent:import-globals --only-global-variables', 'Importing global variables...');
+    }
+
+    protected function setDrivers(array $repositories, string $driver): void
+    {
+        $path = config_path('statamic/eloquent-driver.php');
+        $contents = File::get($path);
+
+        foreach ($repositories as $repository) {
+            $contents = preg_replace(
+                "/('{$repository}'\s*=>\s*\[\s*'driver'\s*=>\s*)'[^']+'/",
+                "$1'{$driver}'",
+                $contents,
+                1
+            );
+        }
+
+        File::put($path, $contents);
     }
 
     protected function setAppName(): void
