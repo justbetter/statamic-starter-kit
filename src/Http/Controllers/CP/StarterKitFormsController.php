@@ -3,6 +3,7 @@
 namespace JustBetter\StatamicStarterKit\Http\Controllers\CP;
 
 use Statamic\Fields\Blueprint;
+use Statamic\Forms\Form;
 use Statamic\Http\Controllers\CP\Forms\FormsController as BaseFormsController;
 
 class StarterKitFormsController extends BaseFormsController
@@ -21,14 +22,15 @@ class StarterKitFormsController extends BaseFormsController
             ],
         ];
 
-        if (isset($blueprintContents['tabs']['email']['fields']['email']['field']['fields']) && is_array($blueprintContents['tabs']['email']['fields']['email']['field']['fields'])) {
-            $fields = $blueprintContents['tabs']['email']['fields']['email']['field']['fields'];
-            $exists = collect($fields)->contains(fn (array $field): bool => ($field['handle'] ?? null) === 'email_content');
-            if (! $exists) {
-                $fields[] = $emailContentField;
-                $blueprintContents['tabs']['email']['fields']['email']['field']['fields'] = $fields;
-            }
-        }
+        $emailContentAvailableFields = [
+            'handle' => 'email_content_available_fields',
+            'field' => [
+                'type' => 'form_email_available_fields',
+                'form' => $form instanceof Form ? $form->handle() : null,
+                'display' => __('Email content fields'),
+                'instructions' => __('justbetter-starter-kit::messages.copy_field_handle_instructions'),
+            ],
+        ];
 
         if (isset($blueprintContents['tabs']['main']['sections']) && is_array($blueprintContents['tabs']['main']['sections'])) {
             $sections = $blueprintContents['tabs']['main']['sections'];
@@ -58,16 +60,21 @@ class StarterKitFormsController extends BaseFormsController
                         continue;
                     }
 
-                    $exists = collect($gridFields)->contains(fn (array $field): bool => ($field['handle'] ?? null) === 'email_content');
-                    if (! $exists) {
+                    $hasEmailContentField = collect($gridFields)->contains(fn (array $field): bool => ($field['handle'] ?? null) === 'email_content');
+                    if (! $hasEmailContentField) {
                         $gridFields[] = $emailContentField;
-
-                        $fieldDefinition['fields'] = $gridFields;
-                        $fieldConfig['field'] = $fieldDefinition;
-                        $sectionFields[$fieldIndex] = $fieldConfig;
-                        $section['fields'] = $sectionFields;
-                        $sections[$sectionIndex] = $section;
                     }
+
+                    $hasEmailContentAvailableFields = collect($gridFields)->contains(fn (array $field): bool => ($field['handle'] ?? null) === 'email_content_available_fields');
+                    if (! $hasEmailContentAvailableFields) {
+                        $gridFields[] = $emailContentAvailableFields;
+                    }
+
+                    $fieldDefinition['fields'] = $gridFields;
+                    $fieldConfig['field'] = $fieldDefinition;
+                    $sectionFields[$fieldIndex] = $fieldConfig;
+                    $section['fields'] = $sectionFields;
+                    $sections[$sectionIndex] = $section;
                 }
             }
 

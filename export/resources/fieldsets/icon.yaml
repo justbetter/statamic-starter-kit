@@ -12,11 +12,11 @@ fields:
         -
           handle: icon
           field:
-            directory: public/icons
             type: icon
-            display: Icon
+            display: Icoon
             localizable: false
             width: 50
+            set: custom-icons
         -
           handle: preserve_icon_color
           field:

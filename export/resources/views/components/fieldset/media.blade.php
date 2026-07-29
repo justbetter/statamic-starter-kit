@@ -1,3 +1,15 @@
+{{--
+Everything that has to do with images or videos.
+
+Examples:
+```
+<x-fieldset.media :media="$media?->value()" />
+```
+
+```
+<x-fieldset.media :media="$media?->value()" class="size-96" />
+```
+--}}
 @props(['media' => false])
 
 @if($media && $media['media'])

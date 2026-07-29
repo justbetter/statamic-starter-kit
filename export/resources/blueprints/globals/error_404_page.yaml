@@ -1,0 +1,10 @@
+title: 'Error 404 page'
+tabs:
+  main:
+    display: Main
+    sections:
+      -
+        display: 'Page Builder'
+        fields:
+          -
+            import: page_builder

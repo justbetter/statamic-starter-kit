@@ -1,0 +1,17 @@
+{
+  "resources/css/justbetter-starter-kit.css": {
+    "file": "assets/justbetter-starter-kit-x1XGuNl0.css",
+    "name": "justbetter-starter-kit",
+    "names": [
+      "justbetter-starter-kit.css"
+    ],
+    "src": "resources/css/justbetter-starter-kit.css",
+    "isEntry": true
+  },
+  "resources/js/justbetter-starter-kit.js": {
+    "file": "assets/justbetter-starter-kit-B9T0HSRW.js",
+    "name": "justbetter-starter-kit",
+    "src": "resources/js/justbetter-starter-kit.js",
+    "isEntry": true
+  }
+}

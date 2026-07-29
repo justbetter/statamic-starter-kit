@@ -43,7 +43,7 @@
                                     <input id="{{ $field['handle'] }}" name="{{ $field['handle'] }}" type="hidden" class="hidden" value="{{ $field['default'] ?? '' }}">
                                     @continue
                                 @endif
-                                <template x-if='{!! $show_field[$field['handle']] ?? true !!}'>
+                                <template x-if="@js($show_field[$field['handle']] ?? true)">
                                     <x-rapidez::tag
                                         :is="$field['type'] === 'checkboxes' || $field['type'] === 'radio' ? 'div' : 'label'"
                                         @class([

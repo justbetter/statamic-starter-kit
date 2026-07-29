@@ -1,3 +1,15 @@
+{{--
+This can be used to display an icon.
+
+Examples:
+```
+<x-fieldset.icon :icon="$icon?->value()"/>
+```
+
+```
+<x-fieldset.icon :icon="$icon?->value()" class="size-20 text-red-700"/>
+```
+--}}
 @props(['icon' => false])
 
 @if ($icon)

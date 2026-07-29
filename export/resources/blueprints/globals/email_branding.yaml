@@ -1,0 +1,104 @@
+title: 'Email Branding'
+tabs:
+  main:
+    display: Main
+    sections:
+      -
+        fields:
+          -
+            handle: logo
+            field:
+              container: assets
+              max_files: 1
+              type: assets
+              display: Logo
+              localizable: false
+      -
+        display: Colors
+        fields:
+          -
+            handle: header_background_color
+            field:
+              type: color
+              display: 'Header background color'
+              default: '#4951D5'
+              localizable: false
+          -
+            handle: footer_background_color
+            field:
+              type: color
+              display: 'Footer background color'
+              default: '#F7F7F7'
+              localizable: false
+          -
+            handle: footer_bottom_background_color
+            field:
+              type: color
+              display: 'Footer bottom background color'
+              default: '#1A1A1A'
+              localizable: false
+          -
+            handle: footer_divider_color
+            field:
+              type: color
+              display: 'Footer divider color'
+              default: '#E0E0E0'
+              localizable: false
+          -
+            handle: email_link_color
+            field:
+              type: color
+              display: 'Email link color'
+              default: '#4951D5'
+              localizable: false
+          -
+            handle: footer_text_color
+            field:
+              type: color
+              display: 'Footer text color'
+              default: '#60606C'
+              localizable: false
+          -
+            handle: footer_link_color
+            field:
+              type: color
+              display: 'Footer link color'
+              default: '#1A1A1A'
+              localizable: false
+      -
+        display: Footer
+        fields:
+          -
+            handle: footer_left_text
+            field:
+              buttons:
+                - bold
+                - italic
+                - unorderedlist
+                - orderedlist
+                - removeformat
+                - anchor
+                - underline
+                - strikethrough
+                - small
+              remove_empty_nodes: false
+              type: bard
+              display: 'Linkerkant - Tekst'
+              localizable: false
+          -
+            handle: footer_right_text
+            field:
+              buttons:
+                - bold
+                - italic
+                - unorderedlist
+                - orderedlist
+                - removeformat
+                - anchor
+                - underline
+                - strikethrough
+                - small
+              remove_empty_nodes: false
+              type: bard
+              display: 'Rechterkant - Tekst'
+              localizable: false

@@ -1,3 +1,16 @@
+{{--
+This is a single button.
+If you need more buttons use the (plural) fieldset.buttons.
+
+Example:
+```
+<x-fieldset.button :button="$button?->value()" />
+```
+
+```
+<x-fieldset.button :button="$button?->value()" class="mt-4"/>
+```
+--}}
 @props(['button' => false, 'link' => true])
 
 @if ($button && ($button['button_text'] ?? false) && ($button->link['link'] ?? false))
@@ -8,13 +21,13 @@
             'outline' => 'button.outline'
         };
     @endphp
-        
+
     <x-fieldset.link :link="$button['link']" :disable="!$link" :attributes="$attributes->twMerge('inline-block')">
         <x-dynamic-component
             :component="$variant"
             class="size-full"
             tag="span"
-        >   
+        >
             <x-fieldset.icon
                 :icon="$button->button_options['icon']"
                 @class(['h-6', $button->button_options['icon_position']?->value() === 'right' ? 'order-last' : null])

@@ -1,5 +1,8 @@
 {
     "name": "justbetter/statamic-starter-kit",
+    "require": {
+        "statamic/cms": "^6.0"
+    },
     "extra": {
         "statamic": {
             "name": "JustBetter Starter Kit",
@@ -26,6 +29,11 @@
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pixelfear/composer-dist-plugin": true
         }
     }
 }
