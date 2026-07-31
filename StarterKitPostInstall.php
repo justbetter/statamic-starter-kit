@@ -1,21 +1,26 @@
 <?php
 
-use Statamic\Support\Str;
+use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
-use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
+use Statamic\Support\Str;
 
 use function Laravel\Prompts\confirm;
 use function Laravel\Prompts\info;
+use function Laravel\Prompts\password;
 use function Laravel\Prompts\search;
 use function Laravel\Prompts\select;
 use function Laravel\Prompts\text;
+use function Laravel\Prompts\warning;
 
 class StarterKitPostInstall
 {
     protected string $env = '';
+
     protected string $app = '';
+
     protected string $sites = '';
+
     protected bool $rapidezStatamic = false;
 
     /**
@@ -31,98 +36,225 @@ class StarterKitPostInstall
 
     public function handle(): void
     {
-        info('🚀 Setting up your JustBetter Statamic starter kit...');
-        
-        $this->installDependencies();
-        
+        info('Setting up your JustBetter Statamic starter kit...');
+
+        $this->ensureJustBetterComposerAccess();
+        $this->installPrivatePackages();
+        $this->restoreAdminRoles();
+
         if (confirm('Do you want to setup for a Rapidez Statamic project?', false)) {
             $this->setupRapidezStatamic();
+            $this->restoreAdminRoles();
         }
-        
+
         $this->configureProject();
         $this->setupDatabase();
         $this->setupMultisite();
         $this->importEloquentContent();
-        
-        info('✅ Starter kit installation completed!');
+
+        info('Starter kit installation completed!');
     }
 
-    protected function installDependencies(): void
+    protected function ensureJustBetterComposerAccess(): void
     {
-        $addons = $this->selectAddons();
-        
-        if (!empty($addons)) {
-            $this->runCommand('composer require ' . implode(' ', $addons), 'Installing selected addons...');
+        $this->ensureJustBetterComposerRepository();
+        $this->ensureJustBetterComposerAuth();
+        $this->ensureAuthJsonIsGitignored();
+    }
+
+    protected function ensureJustBetterComposerRepository(): void
+    {
+        $composerFile = base_path('composer.json');
+
+        if (! File::exists($composerFile)) {
+            return;
         }
-    }
 
-    protected function selectAddons(): array
-    {
-        $addons = [];
+        $composer = json_decode(File::get($composerFile), true) ?: [];
+        $repositories = $composer['repositories'] ?? [];
 
-        $seoAddon = select(
-            'Which SEO addon do you want to use?',
-            [
-                'statamic/seo-pro' => 'Statamic SEO Pro',
-                'none' => 'None',
-            ],
-            'none'
-        );
-
-        if ($seoAddon !== 'none') {
-            $addons[] = $seoAddon;
-            
-            if ($seoAddon === 'statamic/seo-pro') {
-                $this->copySeoProTemplates();
+        foreach ($repositories as $repository) {
+            if (($repository['type'] ?? null) === 'composer'
+                && ($repository['url'] ?? null) === 'https://repo.justbetter.nl') {
+                return;
             }
         }
 
-        $cacheAddon = select(
-            'Which cache addon do you want to use?',
-            [
-                'justbetter/statamic-cloudflare-purge' => 'Cloudflare Purge',
-                'none' => 'None',
-            ],
-            'none'
+        $repositories[] = [
+            'type' => 'composer',
+            'url' => 'https://repo.justbetter.nl',
+        ];
+
+        $composer['repositories'] = $repositories;
+
+        File::put(
+            $composerFile,
+            json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).PHP_EOL
         );
 
-        if ($cacheAddon !== 'none') {
-            $addons[] = $cacheAddon;
-        }
-
-        $structuredDataAddon = select(
-            'Which structured data addon do you want to use?',
-            [
-                'justbetter/statamic-structured-data' => 'Structured Data',
-                'none' => 'None',
-            ],
-            'none'
-        );
-
-        if ($structuredDataAddon !== 'none') {
-            $addons[] = $structuredDataAddon;
-        }
-
-        return $addons;
+        info('Added JustBetter Composer repository (https://repo.justbetter.nl)');
     }
 
-    protected function copySeoProTemplates(): void
+    protected function ensureJustBetterComposerAuth(): void
     {
-        $source = base_path('vendor/justbetter/statamic-starter-kit/export/resources/views/layouts/seo');
-        $destination = base_path('resources/views/layouts/seo');
-        
-        if (File::exists($source)) {
-            File::copyDirectory($source, $destination);
-            info('📁 Copied SEO Pro templates');
+        if ($this->hasJustBetterComposerCredentials()) {
+            info('JustBetter Composer credentials found');
+
+            return;
         }
+
+        warning('JustBetter private packages require Composer credentials for repo.justbetter.nl');
+
+        $username = text(
+            'JustBetter Composer username',
+            required: true
+        );
+
+        $passwordValue = password(
+            'JustBetter Composer password / token',
+            required: true
+        );
+
+        $auth = [];
+        $authPath = base_path('auth.json');
+
+        if (File::exists($authPath)) {
+            $auth = json_decode(File::get($authPath), true) ?: [];
+        }
+
+        $auth['http-basic'] ??= [];
+        $auth['http-basic']['repo.justbetter.nl'] = [
+            'username' => $username,
+            'password' => $passwordValue,
+        ];
+
+        File::put(
+            $authPath,
+            json_encode($auth, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).PHP_EOL
+        );
+
+        info('Wrote local auth.json for repo.justbetter.nl');
+    }
+
+    protected function hasJustBetterComposerCredentials(): bool
+    {
+        foreach ([base_path('auth.json'), ($_SERVER['HOME'] ?? '').'/.composer/auth.json'] as $path) {
+            if (! $path || ! File::exists($path)) {
+                continue;
+            }
+
+            $auth = json_decode(File::get($path), true) ?: [];
+            $basic = $auth['http-basic']['repo.justbetter.nl'] ?? null;
+
+            if (is_array($basic)
+                && filled($basic['username'] ?? null)
+                && filled($basic['password'] ?? null)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function ensureAuthJsonIsGitignored(): void
+    {
+        $gitignorePath = base_path('.gitignore');
+
+        if (! File::exists($gitignorePath)) {
+            File::put($gitignorePath, "/auth.json\n");
+
+            return;
+        }
+
+        $gitignore = File::get($gitignorePath);
+
+        if (preg_match('/(^|\\n)\\/?auth\\.json(\\n|$)/', $gitignore)) {
+            return;
+        }
+
+        File::append($gitignorePath, (str_ends_with($gitignore, "\n") ? '' : "\n")."/auth.json\n");
+        info('Added /auth.json to .gitignore');
+    }
+
+    protected function installPrivatePackages(): void
+    {
+        $this->runCommand(
+            'composer require just-better/laravel-healthchecks:^2.0 just-better/statamic-authentik:^2.0 --no-security-blocking',
+            'Installing private JustBetter packages...'
+        );
+
+        $this->publishPrivatePackageFallbacks();
+    }
+
+    protected function publishPrivatePackageFallbacks(): void
+    {
+        if (! File::exists(config_path('healthchecks.php'))) {
+            $this->runCommand(
+                'php artisan vendor:publish --provider="JustBetter\\HealthChecks\\ServiceProvider" --tag=config --no-interaction',
+                'Publishing HealthChecks config...'
+            );
+        }
+
+        if (! File::exists(config_path('statamic-authentik.php'))) {
+            $this->runCommand(
+                'php artisan vendor:publish --provider="JustBetter\\StatamicAuthentik\\ServiceProvider" --no-interaction',
+                'Publishing Authentik config...'
+            );
+        }
+
+        if (! File::exists(database_path('migrations')) || collect(File::files(database_path('migrations')))
+            ->filter(fn ($file) => str_contains($file->getFilename(), 'create_health_tables'))
+            ->isEmpty()) {
+            $this->runCommand(
+                'php artisan vendor:publish --tag=health-migrations --no-interaction',
+                'Publishing HealthChecks migrations...'
+            );
+        }
+    }
+
+    protected function restoreAdminRoles(): void
+    {
+        $candidates = [
+            base_path('vendor/justbetter/statamic-starter-kit/export/resources/users/roles.yaml'),
+            base_path('vendor/justbetter/statamic-starter-kit/resources/users/roles.yaml'),
+        ];
+
+        $destination = resource_path('users/roles.yaml');
+
+        foreach ($candidates as $source) {
+            if (! File::exists($source)) {
+                continue;
+            }
+
+            File::ensureDirectoryExists(dirname($destination));
+            File::copy($source, $destination);
+            info('Restored admin role permissions');
+
+            return;
+        }
+
+        File::ensureDirectoryExists(dirname($destination));
+        File::put($destination, <<<'YAML'
+admin:
+  title: Administrator
+  permissions:
+    - access cp
+    - access detours
+    - edit all globals
+    - edit all entries
+    - edit all terms
+    - edit all navigation
+    - edit all assets
+YAML);
+        info('Wrote default admin role permissions');
     }
 
     protected function setupRapidezStatamic(): void
     {
         $this->rapidezStatamic = true;
-        
-        info('⚡ Setting up Rapidez Statamic...');
-        
+
+        info('Setting up Rapidez Statamic...');
+
         $this->runCommand('php artisan statamic:install', 'Installing Statamic...');
         $this->updateComposerScripts();
         $this->runCommand('php artisan vendor:publish --provider=Rapidez\Statamic\RapidezStatamicServiceProvider --tag=rapidez-user-model', 'Publishing user model...');
@@ -133,33 +265,33 @@ class StarterKitPostInstall
     protected function updateComposerScripts(): void
     {
         $composerFile = base_path('composer.json');
-        
-        if (!File::exists($composerFile)) {
+
+        if (! File::exists($composerFile)) {
             return;
         }
 
         $composer = json_decode(File::get($composerFile), true);
-        
+
         $composer['scripts'] ??= [];
         $composer['scripts']['post-autoload-dump'] ??= [];
-        
+
         $statamicInstallScript = '@php artisan statamic:install --ansi';
-        
-        if (!in_array($statamicInstallScript, $composer['scripts']['post-autoload-dump'])) {
+
+        if (! in_array($statamicInstallScript, $composer['scripts']['post-autoload-dump'])) {
             $composer['scripts']['post-autoload-dump'][] = $statamicInstallScript;
-            File::put($composerFile, json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-            info('📝 Updated composer.json with Statamic install script');
+            File::put($composerFile, json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).PHP_EOL);
+            info('Updated composer.json with Statamic install script');
         }
     }
 
     protected function configureProject(): void
     {
-        if ($this->rapidezStatamic || !confirm('Do you want to configure your project settings?', true)) {
+        if ($this->rapidezStatamic || ! confirm('Do you want to configure your project settings?', true)) {
             return;
         }
 
-        info('⚙️ Configuring project settings...');
-        
+        info('Configuring project settings...');
+
         $this->loadConfigFiles();
         $this->configureEnvironment();
         $this->saveConfigFiles();
@@ -185,9 +317,9 @@ class StarterKitPostInstall
         $this->setDebugbarConfig();
         $this->setImageConfig();
         $this->setMailConfig();
-        
+
         File::put(base_path('.env'), $this->env);
-        info('✅ Environment configuration updated');
+        info('Environment configuration updated');
     }
 
     protected function saveConfigFiles(): void
@@ -204,19 +336,19 @@ class StarterKitPostInstall
 
     protected function setupDatabase(): void
     {
-        info('🗄️ Setting up database...');
-        
+        info('Setting up database...');
+
         $dbPath = base_path('database/database.sqlite');
         if (File::exists($dbPath)) {
             File::delete($dbPath);
         }
-        
+
         $this->runCommand('php artisan migrate', 'Running migrations...');
     }
 
     protected function setupMultisite(): void
     {
-        if ($this->rapidezStatamic || !confirm('Would you like to configure multisite? (Requires Statamic PRO license)', false)) {
+        if ($this->rapidezStatamic || ! confirm('Would you like to configure multisite? (Requires Statamic PRO license)', false)) {
             return;
         }
 
@@ -231,7 +363,7 @@ class StarterKitPostInstall
 
     protected function importEloquentContent(): void
     {
-        info('📦 Importing file content into Eloquent...');
+        info('Importing file content into Eloquent...');
 
         $this->runCommand('php artisan statamic:eloquent:import-navs --force --only-nav-trees', 'Importing navigation trees...');
         $this->runCommand('php artisan statamic:eloquent:import-collections --force --only-collection-trees', 'Importing collection trees...');
@@ -302,8 +434,8 @@ class StarterKitPostInstall
         $username = text('Database username?', default: 'root', required: true);
         $this->replaceInEnv('DB_USERNAME=root', "DB_USERNAME={$username}");
 
-        $password = text('Database password?', required: false);
-        $this->replaceInEnv('DB_PASSWORD=', "DB_PASSWORD={$password}");
+        $passwordValue = text('Database password?', required: false);
+        $this->replaceInEnv('DB_PASSWORD=', "DB_PASSWORD={$passwordValue}");
     }
 
     protected function setLocaleConfig(): void
@@ -323,8 +455,8 @@ class StarterKitPostInstall
             'App timezone?',
             options: function (string $value) {
                 $timezones = timezone_identifiers_list(\DateTimeZone::ALL);
-                
-                if (!$value) {
+
+                if (! $value) {
                     return $timezones;
                 }
 
@@ -343,7 +475,7 @@ class StarterKitPostInstall
 
     protected function setDebugbarConfig(): void
     {
-        if (!confirm('Enable debugbar?', false)) {
+        if (! confirm('Enable debugbar?', false)) {
             $this->replaceInEnv('DEBUGBAR_ENABLED=true', 'DEBUGBAR_ENABLED=false');
         }
     }
@@ -361,7 +493,7 @@ class StarterKitPostInstall
             'Local mailer preference?',
             [
                 'mailpit' => 'Mailpit',
-                'mailtrap' => 'Mailtrap', 
+                'mailtrap' => 'Mailtrap',
                 'helo' => 'Helo',
                 'herd' => 'Herd Pro',
                 'log' => 'Log only',
@@ -376,11 +508,11 @@ class StarterKitPostInstall
                 $this->replaceInEnv('MAIL_PORT=1025', 'MAIL_PORT=2525');
                 $this->replaceInEnv('MAIL_USERNAME=null', 'MAIL_USERNAME="${APP_NAME}"');
                 break;
-                
+
             case 'log':
                 $this->replaceInEnv('MAIL_MAILER=smtp', 'MAIL_MAILER=log');
                 break;
-                
+
             case 'mailtrap':
                 break;
         }
@@ -405,7 +537,7 @@ class StarterKitPostInstall
         $result = Process::forever()->tty()->run($command);
 
         if ($result->failed()) {
-            throw new \Exception("Failed to run: {$command}\nError: " . $result->errorOutput());
+            throw new \Exception("Failed to run: {$command}\nError: ".$result->errorOutput());
         }
     }
 }
