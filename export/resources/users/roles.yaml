@@ -1,0 +1,10 @@
+admin:
+  title: Administrator
+  permissions:
+    - access cp
+    - access detours
+    - edit all globals
+    - edit all entries
+    - edit all terms
+    - edit all navigation
+    - edit all assets

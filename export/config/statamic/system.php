@@ -47,6 +47,28 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Blueprints Path
+    |--------------------------------------------------------------------------
+    |
+    | Here you may define the path where your blueprints are stored.
+    |
+    */
+
+    'blueprints_path' => resource_path('blueprints'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Fieldsets Path
+    |--------------------------------------------------------------------------
+    |
+    | Here you may define the path where your fieldsets are stored.
+    |
+    */
+
+    'fieldsets_path' => resource_path('fieldsets'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Send the Powered-By Header
     |--------------------------------------------------------------------------
     |
@@ -246,6 +268,34 @@ return [
     */
 
     'layout' => env('STATAMIC_LAYOUT', 'layout'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Blueprint Templates
+    |--------------------------------------------------------------------------
+    |
+    | Here you may define blueprint templates that can be used as starting
+    | points when creating new blueprints in the control panel.
+    |
+    */
+
+    'blueprint_templates' => [
+        //
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | File Uploads
+    |--------------------------------------------------------------------------
+    |
+    | When uploading files through fields that aren't assets (like Bard
+    | attachments), these settings control where they get stored.
+    |
+    */
+
+    'file_uploads_disk' => env('STATAMIC_FILE_UPLOADS_DISK', 'local'),
+
+    'file_uploads_path' => env('STATAMIC_FILE_UPLOADS_PATH', 'statamic/file-uploads'),
 
     'urls' => [
         'default' => env('SITES_DEFAULT_URL', '/'),
