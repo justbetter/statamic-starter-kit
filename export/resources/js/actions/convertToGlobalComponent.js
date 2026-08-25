@@ -1,14 +1,14 @@
 export default function convertToGlobalComponent() {
     return {
-        title: 'Convert to global component',
+        title: __('Convert to global component'),
         confirm: {
-            title: 'Convert to global component',
-            text: 'This will create a reusable global component and replace this component with a reference to it.',
-            buttonText: 'Convert',
+            title: __('Convert to global component'),
+            text: __('This will create a reusable global component and replace this component with a reference to it.'),
+            buttonText: __('Convert'),
             fields: {
                 title: {
                     type: 'text',
-                    display: 'Title',
+                    display: __('Title'),
                     validate: ['required'],
                 },
             },
@@ -37,16 +37,16 @@ export default function convertToGlobalComponent() {
                 const data = await response.json();
 
                 if (! response.ok) {
-                    throw new Error(data.message || 'Could not create global component.');
+                    throw new Error(data.message || __('Could not create global component.'));
                 }
 
                 payload.updateMeta('global_component', relationshipMeta(data));
                 payload.update('global_component', [data.id]);
                 payload.update('type', 'global_component');
 
-                Statamic.$toast.success('Global component created.');
+                Statamic.$toast.success(__('Global component created.'));
             }).catch((error) => {
-                Statamic.$toast.error(error.message || 'Could not create global component.');
+                Statamic.$toast.error(error.message || __('Could not create global component.'));
             });
         }
     }
