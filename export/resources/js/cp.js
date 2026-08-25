@@ -12,3 +12,7 @@ Statamic.booting(() => {
 });
 
 */
+
+import convertToGlobalComponent from './actions/convertToGlobalComponent';
+
+Statamic.$fieldActions.add('replicator-fieldtype-set', convertToGlobalComponent());

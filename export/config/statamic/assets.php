@@ -223,4 +223,71 @@ return [
 
     'svg_sanitization_on_upload' => true,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Video Thumbnails
+    |--------------------------------------------------------------------------
+    |
+    | Generate thumbnails for video assets in the Control Panel.
+    |
+    */
+
+    'video_thumbnails' => true,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Crop Aspect Ratios
+    |--------------------------------------------------------------------------
+    |
+    | Aspect ratios available in the asset cropper.
+    |
+    */
+
+    'crop_aspect_ratios' => [
+        '16:9',
+        '4:3',
+        '3:2',
+        '2:1',
+        '1:1',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Additional Filename Replacements
+    |--------------------------------------------------------------------------
+    |
+    | Additional character replacements applied when cleaning asset filenames.
+    |
+    */
+
+    'additional_filename_replacements' => [],
+
+    /*
+    |--------------------------------------------------------------------------
+    | FFmpeg
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for FFmpeg when generating video thumbnails.
+    |
+    */
+
+    'ffmpeg' => [
+        'binary' => null,
+        'cache_path' => storage_path('statamic/glide/ffmpeg'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Set Preview Images
+    |--------------------------------------------------------------------------
+    |
+    | Where Bard/Replicator set preview images are stored.
+    |
+    */
+
+    'set_preview_images' => [
+        'container' => 'assets',
+        'folder' => 'set-previews',
+    ],
+
 ];
