@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Cp;
+namespace JustBetter\StatamicStarterKit\Http\Controllers\CP;
 
-use App\Http\Requests\Cp\StoreGlobalComponentRequest;
+use JustBetter\StatamicStarterKit\Http\Requests\Cp\StoreGlobalComponentRequest;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Entries\Collection as StatamicCollection;
 use Statamic\Entries\Entry as StatamicEntry;
