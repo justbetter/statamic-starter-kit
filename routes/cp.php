@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Cp\GlobalComponentController;
+use JustBetter\StatamicStarterKit\Http\Controllers\CP\GlobalComponentController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('global-components/convert', GlobalComponentController::class)
