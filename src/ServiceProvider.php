@@ -4,7 +4,9 @@ namespace JustBetter\StatamicStarterKit;
 
 use Illuminate\Routing\Router;
 use JustBetter\StatamicStarterKit\Http\Controllers\CP\StarterKitFormsController;
+use JustBetter\StatamicStarterKit\Widgets\Caches;
 use Statamic\Facades\Icon;
+use Statamic\Facades\Permission;
 use Statamic\Http\Controllers\CP\Forms\FormsController;
 use Statamic\Http\Middleware\RedirectAbsoluteDomains;
 use Statamic\Providers\AddonServiceProvider;
@@ -20,6 +22,10 @@ class ServiceProvider extends AddonServiceProvider
         'publicDirectory' => 'resources/dist',
     ];
 
+    protected $widgets = [
+        Caches::class,
+    ];
+
     public function bootAddon(): void
     {
         $this->loadTranslationsFrom(__DIR__.'/../lang', 'justbetter-starter-kit');
@@ -33,5 +39,47 @@ class ServiceProvider extends AddonServiceProvider
 
         Icon::register('custom-svg', resource_path('svg'));
         Icon::register('custom-icons', public_path('icons'));
+
+        $this->bootPermissions();
+        $this->bootDashboardCacheWidget();
+    }
+
+    protected function bootPermissions(): void
+    {
+        Permission::extend(function () {
+            Permission::group('justbetter', 'JustBetter', function () {
+                Permission::register('clear caches')
+                    ->label(__('justbetter-starter-kit::messages.permission_clear_caches'));
+            });
+        });
+    }
+
+    protected function bootDashboardCacheWidget(): void
+    {
+        if (! config('statamic-starter-kit.dashboard_cache_widget', true)) {
+            return;
+        }
+
+        $widgets = collect(config('statamic.cp.widgets', []));
+
+        $alreadyPresent = $widgets->contains(function (mixed $widget): bool {
+            $type = is_string($widget) ? $widget : ($widget['type'] ?? null);
+
+            return $type === 'caches';
+        });
+
+        if ($alreadyPresent) {
+            return;
+        }
+
+        config([
+            'statamic.cp.widgets' => $widgets
+                ->push([
+                    'type' => 'caches',
+                    'width' => 50,
+                    'can' => 'clear caches',
+                ])
+                ->all(),
+        ]);
     }
 }
