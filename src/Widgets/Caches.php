@@ -26,13 +26,21 @@ class Caches extends Widget
                 'static_description' => __('justbetter-starter-kit::messages.caches_static_description'),
                 'static_disabled' => __('justbetter-starter-kit::messages.caches_static_disabled'),
                 'clear' => __('justbetter-starter-kit::messages.caches_clear'),
-                'confirm_application_title' => __('justbetter-starter-kit::messages.caches_confirm_application_title'),
-                'confirm_application_body' => __('justbetter-starter-kit::messages.caches_confirm_application_body'),
-                'confirm_static_title' => __('justbetter-starter-kit::messages.caches_confirm_static_title'),
-                'confirm_static_body' => __('justbetter-starter-kit::messages.caches_confirm_static_body'),
-                'confirm_button' => __('justbetter-starter-kit::messages.caches_confirm_button'),
-                'success_application' => __('justbetter-starter-kit::messages.caches_success_application'),
-                'success_static' => __('justbetter-starter-kit::messages.caches_success_static'),
+                'confirm' => [
+                    'application' => [
+                        'title' => __('justbetter-starter-kit::messages.caches_confirm_application_title'),
+                        'body' => __('justbetter-starter-kit::messages.caches_confirm_application_body'),
+                    ],
+                    'static' => [
+                        'title' => __('justbetter-starter-kit::messages.caches_confirm_static_title'),
+                        'body' => __('justbetter-starter-kit::messages.caches_confirm_static_body'),
+                    ],
+                    'button' => __('justbetter-starter-kit::messages.caches_confirm_button'),
+                ],
+                'success' => [
+                    'application' => __('justbetter-starter-kit::messages.caches_success_application'),
+                    'static' => __('justbetter-starter-kit::messages.caches_success_static'),
+                ],
                 'error' => __('justbetter-starter-kit::messages.caches_error'),
             ],
         ]);

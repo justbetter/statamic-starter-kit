@@ -40,11 +40,11 @@ class ServiceProvider extends AddonServiceProvider
         Icon::register('custom-svg', resource_path('svg'));
         Icon::register('custom-icons', public_path('icons'));
 
-        $this->bootPermissions();
-        $this->bootDashboardCacheWidget();
+        $this->bootPermissions()
+            ->bootDashboardCacheWidget();
     }
 
-    protected function bootPermissions(): void
+    protected function bootPermissions(): self
     {
         Permission::extend(function () {
             Permission::group('justbetter', 'JustBetter', function () {
@@ -52,12 +52,14 @@ class ServiceProvider extends AddonServiceProvider
                     ->label(__('justbetter-starter-kit::messages.permission_clear_caches'));
             });
         });
+
+        return $this;
     }
 
-    protected function bootDashboardCacheWidget(): void
+    protected function bootDashboardCacheWidget(): self
     {
         if (! config('statamic-starter-kit.dashboard_cache_widget', true)) {
-            return;
+            return $this;
         }
 
         $widgets = collect(config('statamic.cp.widgets', []));
@@ -69,7 +71,7 @@ class ServiceProvider extends AddonServiceProvider
         });
 
         if ($alreadyPresent) {
-            return;
+            return $this;
         }
 
         config([
@@ -81,5 +83,7 @@ class ServiceProvider extends AddonServiceProvider
                 ])
                 ->all(),
         ]);
+
+        return $this;
     }
 }

@@ -34,9 +34,9 @@
 
         <ConfirmationModal
             :open="confirming !== null"
-            :title="confirmTitle"
-            :body-text="confirmBody"
-            :button-text="labels.confirm_button"
+            :title="labels.confirm[confirming]?.title"
+            :body-text="labels.confirm[confirming]?.body"
+            :button-text="labels.confirm.button"
             :busy="busy"
             danger
             @update:open="onModalOpenChange"
@@ -46,7 +46,7 @@
 </template>
 
 <script setup>
-import { computed, getCurrentInstance, ref } from 'vue';
+import { getCurrentInstance, ref } from 'vue';
 import { Button, ConfirmationModal, Description, Text, Widget } from '@statamic/cms/ui';
 
 const { title, clearApplicationUrl, clearStaticUrl, staticCacheEnabled, labels } = defineProps({
@@ -61,30 +61,6 @@ const confirming = ref(null);
 const busy = ref(false);
 const app = getCurrentInstance()?.proxy;
 
-const confirmTitle = computed(() => {
-    if (confirming.value === 'application') {
-        return labels.confirm_application_title;
-    }
-
-    if (confirming.value === 'static') {
-        return labels.confirm_static_title;
-    }
-
-    return '';
-});
-
-const confirmBody = computed(() => {
-    if (confirming.value === 'application') {
-        return labels.confirm_application_body;
-    }
-
-    if (confirming.value === 'static') {
-        return labels.confirm_static_body;
-    }
-
-    return '';
-});
-
 function onModalOpenChange(open) {
     if (!open && !busy.value) {
         confirming.value = null;
@@ -98,13 +74,12 @@ async function clearCache() {
 
     const type = confirming.value;
     const url = type === 'application' ? clearApplicationUrl : clearStaticUrl;
-    const successMessage = type === 'application' ? labels.success_application : labels.success_static;
 
     busy.value = true;
 
     try {
         const response = await app.$axios.post(url);
-        app.$toast.success(response.data?.message || successMessage);
+        app.$toast.success(response.data?.message || labels.success[type]);
         confirming.value = null;
     } catch {
         app.$toast.error(labels.error);
