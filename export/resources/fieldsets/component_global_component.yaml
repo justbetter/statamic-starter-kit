@@ -1,4 +1,4 @@
-title: 'Component - Global Component'
+title: 'Component - Global component'
 fields:
   -
     handle: global_component
@@ -8,5 +8,5 @@ fields:
       collections:
         - global_components
       type: entries
-      display: 'Global Component'
+      display: 'Global component'
       localizable: false

@@ -15,7 +15,7 @@ fields:
           value: Fullscreen
       type: select
       display: Display
-      default: full_width
+      default: container
       localizable: false
       width: 50
   -

@@ -19,9 +19,9 @@ If you need to change or add classes for the single buttons use the
 @slots(['button'])
 
 @if(is_iterable($buttons) && count($buttons['buttons']))
-    <x-button.wrapper {{ $attributes }}>
+    <x-rapidez::button.wrapper {{ $attributes }}>
         @foreach($buttons['buttons'] as $item)
             <x-fieldset.button :button="$item['button']" :attributes="$button->attributes" />
         @endforeach
-    </x-button.wrapper>
+    </x-rapidez::button.wrapper>
 @endif

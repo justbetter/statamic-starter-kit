@@ -12,6 +12,7 @@
 
 @theme {
     --font-sans: system-ui, sans-serif;
+    --font-heading: var(--font-sans);
 
     --primary: #4951D5;
     --primary-text: var(--color-white);
@@ -21,7 +22,7 @@
     --secondary-text: var(--color-white);
 
     --foreground: #1A1A1A;
-    --foreground-muted: #60606C;
+    --foreground-muted: color-mix(in srgb, var(--foreground) 80%, transparent);
 
     --border-emphasis: #1A1A1A;
     --border: #CCCCCC;
@@ -32,14 +33,12 @@
 
     --color-primary: var(--primary);
     --color-primary-text: var(--primary-text);
-    --color-primary-border: var(--primary-border);
 
     --color-secondary: var(--secondary);
     --color-secondary-text: var(--secondary-text);
 
     --color-conversion: var(--conversion);
     --color-conversion-text: var(--conversion-text);
-    --color-conversion-border: var(--conversion-border);
 
     --text-color-emphasis: var(--foreground-emphasis);
     --text-color-default: var(--foreground);
@@ -52,16 +51,13 @@
     --ring-color-emphasis: var(--border-emphasis);
     --ring-color-default: var(--border);
     --ring-color-muted: var(--border-muted);
-    --ring-color-active: var(--border-active);
 
     --outline-color-emphasis: var(--border-emphasis);
     --outline-color-default: var(--border);
     --outline-color-muted: var(--border-muted);
-    --outline-color-active: var(--border-active);
 
     --background-color-emphasis: var(--background-emphasis);
     --background-color-default: var(--background);
-    --background-color-muted: var(--background-muted);
 
     --color-success: #38C172;
 
@@ -98,6 +94,22 @@
 
 @utility border {
     border-color: var(--border-color-default);
+}
+
+@utility text-h1 {
+    @apply md:text-6xl text-4xl;
+}
+
+@utility text-h2 {
+    @apply md:text-5xl text-3xl;
+}
+
+@utility text-h3 {
+    @apply md:text-3xl text-2xl;
+}
+
+@utility text-h4 {
+    @apply md:text-xl text-lg;
 }
 
 @layer base {

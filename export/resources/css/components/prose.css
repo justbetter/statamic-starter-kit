@@ -1,14 +1,15 @@
 .prose-custom {
     @apply
-        text-lg max-sm:text-base font-sans! **:font-sans!
-        *:mt-5 *:first:mt-0
-        prose-ul:prose-li:*:before:check-icon prose-ul:prose-li:*:flex prose-li:mt-1.5 prose-ul:mt-3 prose-ol:mt-2.5 prose-ol:prose-li:list-decimal prose-ol:list-inside prose-ol:prose-p:inline-block
-        prose-h1:text-4xl prose-h2:text-3xl prose-h3:text-2xl prose-headings:text-lg prose-headings:first:text-4xl prose-headings:font-semibold 
-        prose-a:underline prose-a:text-primary
-        empty:hidden *:empty:hidden;
+        text-base text
+        *:not-first:mt-5 prose-headings:not-first:mt-6 prose-p:not-first:mt-4 prose-ul:not-first:mt-3 prose-ol:not-first:mt-3 prose-p:text-muted
+        prose-ul:prose-li:before:check-icon prose-li:prose-a:decoration-1 prose-li:prose-a:hover:text-primary prose-li:prose-a:hover:bg prose-ul:prose-li:flex prose-li:not-first:mt-2 prose-strong:text
+        prose-ol:list-decimal prose-ol:pl-5 prose-ol:marker:text-primary prose-ol:marker:font-medium prose-ol:prose-li:pl-2.5
+        prose-headings:first:text-h2 prose-h1:first:text-h1 prose-h2:text-h2 prose-h3:text-h3 prose-h4:text-h4 prose-headings:font-semibold prose-headings:font-heading prose-headings:prose-em:not-italic prose-headings:prose-em:text-secondary
+        prose-a:underline
+        max-w-4xl empty:hidden;
 } 
 
 @utility check-icon {
-    @apply size-5.5 max-sm:size-4.5 shrink-0 mask-contain mask-no-repeat bg-primary translate-y-0.5 inline-block mr-3.5 max-sm:mr-3;
-    mask-image: url("data:image/svg+xml,%0A%3Csvg width='24' height='24' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg clip-path='url(%23clip0_6876_6808)'%3E%3Cmask id='mask0_6876_6808' style='mask-type:luminance' maskUnits='userSpaceOnUse' x='0' y='0' width='24' height='24'%3E%3Cpath d='M24 0H0V24H24V0Z' fill='white'/%3E%3C/mask%3E%3Cg mask='url(%23mask0_6876_6808)'%3E%3Cpath d='M21.9998 11.08V12C21.9985 14.1565 21.3003 16.2546 20.0091 17.9818C18.7179 19.7089 16.903 20.9725 14.8351 21.5839C12.7672 22.1953 10.557 22.1219 8.53423 21.3745C6.51144 20.6273 4.78441 19.246 3.61071 17.437C2.43701 15.628 1.87955 13.488 2.02143 11.3363C2.16331 9.18455 2.99696 7.13631 4.39804 5.49706C5.7991 3.85781 7.69253 2.71537 9.79594 2.24014C11.8994 1.76489 14.1 1.98232 16.0698 2.85999' stroke='%23525AD7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M22 4L12 14.01L9 11.01' stroke='%23525AD7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_6876_6808'%3E%3Crect width='24' height='24' fill='white'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E%0A");
+    @apply size-4 shrink-0 mask-contain mask-no-repeat bg-primary translate-y-0.5 inline-block mr-3;
+    mask-image: url("data:image/svg+xml,%3Csvg width='17' height='16' viewBox='0 0 17 16' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M16.4986 0.238866C17.0413 0.638746 17.1627 1.40775 16.7681 1.95758L7.05349 15.492C6.84478 15.7842 6.52223 15.9649 6.16552 15.9957C5.80881 16.0264 5.46349 15.8919 5.21304 15.6381L0.355758 10.7165C-0.118586 10.2359 -0.118586 9.45533 0.355758 8.9747C0.830101 8.49408 1.60044 8.49408 2.07478 8.9747L5.92645 12.8774L14.8062 0.508016C15.2008 -0.0418188 15.9598 -0.164859 16.5024 0.235021L16.4986 0.238866Z' fill='%23FCAE42'/%3E%3C/svg%3E%0A");
 }

@@ -1,0 +1,49 @@
+title: Heading
+fields:
+  -
+    handle: heading
+    field:
+      type: group
+      display: Heading
+      localizable: false
+      hide_display: true
+      fullscreen: false
+      border: false
+      fields:
+        -
+          handle: heading
+          field:
+            buttons:
+              - italic
+            save_html: true
+            remove_empty_nodes: false
+            inline: true
+            inline_hard_breaks: true
+            type: bard
+            display: Heading
+            localizable: false
+            width: 66
+            instructions_position: below
+        -
+          handle: heading_type
+          field:
+            options:
+              - key: strong
+                value: Strong
+              - key: h1
+                value: H1
+              - key: h2
+                value: H2
+              - key: h3
+                value: H3
+              - key: h4
+                value: H4
+              - key: h5
+                value: H5
+              - key: h6
+                value: H6
+            type: select
+            display: 'Heading type'
+            localizable: false
+            width: 33
+            default: strong

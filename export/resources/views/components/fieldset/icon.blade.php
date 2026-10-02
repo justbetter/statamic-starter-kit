@@ -1,7 +1,7 @@
 {{--
 This can be used to display an icon.
 
-Examples:
+Usage:
 ```
 <x-fieldset.icon :icon="$icon?->value()"/>
 ```
@@ -12,7 +12,7 @@ Examples:
 --}}
 @props(['icon' => false])
 
-@if ($icon)
+@if ($icon && $icon['icon'])
     <span {{ $attributes->twMerge('h-8 inline-flex items-center justify-center *:w-auto *:h-full shrink-0' . (!$icon['preserve_icon_color'] ? ' [&_[fill]:not([fill=none])]:fill-current [&_[stroke]:not([stroke=none])]:stroke-current' : '')) }}>
         {!! $icon['icon'] !!}
     </span>

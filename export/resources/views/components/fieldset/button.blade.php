@@ -16,9 +16,10 @@ Example:
 @if ($button && ($button['button_text'] ?? false) && ($button->link['link'] ?? false))
     @php
         $variant = match($button['button_variant']->value()) {
-            default => 'button.primary',
-            'secondary' => 'button.secondary',
-            'outline' => 'button.outline'
+            default => 'rapidez::button.primary',
+            'primary' => 'rapidez::button.primary',
+            'secondary' => 'rapidez::button.secondary',
+            'outline' => 'rapidez::button.outline'
         };
     @endphp
 
