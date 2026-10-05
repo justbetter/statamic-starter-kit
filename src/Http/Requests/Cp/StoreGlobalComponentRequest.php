@@ -1,6 +1,6 @@
 <?php
 
-namespace JustBetter\StatamicStarterKit\Http\Requests\Cp;
+namespace JustBetter\StatamicStarterKit\Http\Requests\CP;
 
 use Illuminate\Foundation\Http\FormRequest;
 

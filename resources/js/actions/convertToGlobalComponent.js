@@ -1,14 +1,14 @@
 export default function convertToGlobalComponent() {
     return {
-        title: __('Convert to global component'),
+        title: __('justbetter-starter-kit::messages.convert_to_global_component'),
         confirm: {
-            title: __('Convert to global component'),
-            text: __('This will create a reusable global component and replace this component with a reference to it.'),
-            buttonText: __('Convert'),
+            title: __('justbetter-starter-kit::messages.convert_to_global_component'),
+            text: __('justbetter-starter-kit::messages.convert_to_global_component_text'),
+            buttonText: __('justbetter-starter-kit::messages.convert'),
             fields: {
                 title: {
                     type: 'text',
-                    display: __('Title'),
+                    display: __('justbetter-starter-kit::messages.title'),
                     validate: ['required'],
                 },
             },
@@ -37,16 +37,16 @@ export default function convertToGlobalComponent() {
                 const data = await response.json();
 
                 if (! response.ok) {
-                    throw new Error(data.message || __('Could not create global component.'));
+                    throw new Error(data.message || __('justbetter-starter-kit::messages.could_not_create_global_component'));
                 }
 
                 payload.updateMeta('global_component', relationshipMeta(data));
                 payload.update('global_component', [data.id]);
                 payload.update('type', 'global_component');
 
-                Statamic.$toast.success(__('Global component created.'));
+                Statamic.$toast.success(__('justbetter-starter-kit::messages.global_component_created'));
             }).catch((error) => {
-                Statamic.$toast.error(error.message || __('Could not create global component.'));
+                Statamic.$toast.error(error.message || __('justbetter-starter-kit::messages.could_not_create_global_component'));
             });
         }
     }
