@@ -1,4 +1,25 @@
-export default function convertToGlobalComponent() {
+/* global Statamic, __, cp_url */
+
+const defaults = {
+    collection: 'global_components',
+    page_builder_field: 'page_builder',
+    set_handle: 'global_component',
+    relationship_field: 'global_component',
+};
+
+function resolveConfig(config = {}) {
+    return {
+        ...defaults,
+        ...config,
+    };
+}
+
+export default function convertToGlobalComponent(config = {}) {
+    const {
+        set_handle: setHandle,
+        relationship_field: relationshipField,
+    } = resolveConfig(config);
+
     return {
         title: __('justbetter-starter-kit::messages.convert_to_global_component'),
         confirm: {
@@ -15,7 +36,7 @@ export default function convertToGlobalComponent() {
         },
 
         visible(payload) {
-            return payload.config.handle !== 'global_component';
+            return payload.config.handle !== setHandle;
         },
 
         run(payload) {
@@ -40,9 +61,9 @@ export default function convertToGlobalComponent() {
                     throw new Error(data.message || __('justbetter-starter-kit::messages.could_not_create_global_component'));
                 }
 
-                payload.updateMeta('global_component', relationshipMeta(data));
-                payload.update('global_component', [data.id]);
-                payload.update('type', 'global_component');
+                payload.updateMeta(relationshipField, relationshipMeta(data));
+                payload.update(relationshipField, [data.id]);
+                payload.update('type', setHandle);
 
                 Statamic.$toast.success(__('justbetter-starter-kit::messages.global_component_created'));
             }).catch((error) => {

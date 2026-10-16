@@ -19,7 +19,12 @@ class GlobalComponentController extends CpController
      */
     public function __invoke(StoreGlobalComponentRequest $request): array
     {
-        $collection = Collection::findByHandle('global_components');
+        abort_unless((bool) config('statamic-starter-kit.convert_to_global_component.enabled', true), 404);
+
+        $collectionHandle = (string) config('statamic-starter-kit.convert_to_global_component.collection', 'global_components');
+        $pageBuilderField = (string) config('statamic-starter-kit.convert_to_global_component.page_builder_field', 'page_builder');
+
+        $collection = Collection::findByHandle($collectionHandle);
 
         abort_if($collection === null, 404);
 
@@ -50,7 +55,7 @@ class GlobalComponentController extends CpController
             ->fields()
             ->addValues([
                 'title' => $title,
-                'page_builder' => [$component],
+                $pageBuilderField => [$component],
             ])
             ->process()
             ->values();
