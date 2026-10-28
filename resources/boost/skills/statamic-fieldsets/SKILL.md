@@ -77,9 +77,12 @@ Some fieldsets expose named slots (e.g. `label` and `content` on `accordion`). S
 
 Only use a slot when the developer explicitly asks for it.
 
+When a fieldset component passes attributes on to an inner component, pass them unchanged: `:$attributes` for the component's own attributes, `:attributes="$label->attributes"` for a slot's attributes, `{{ $attributes }}` on an element. Only call `twMerge()` when there are default classes to merge (`$attributes->twMerge('flex gap-2')`); an empty `twMerge()` does nothing.
+
 ## Fieldset overview
 
 ### title
+
 Component title. Built on `heading`.
 - Place `<x-fieldset.title />` at most once per template. Editors may still end up with more titles through their own configuration (e.g. a title set inside `content`); that is their choice and fine.
 - Recognizable as a large title introducing a component.
@@ -91,6 +94,7 @@ Component title. Built on `heading`.
 ```
 
 ### heading
+
 A heading where the editor chooses the level (h1 to h6) or strong.
 - May appear multiple times within one component.
 - Is not a component title; use `title` for that.
@@ -101,6 +105,7 @@ A heading where the editor chooses the level (h1 to h6) or strong.
 ```
 
 ### content
+
 For larger amounts of text: blog posts, but also most text blocks within components.
 - Prefer combining text, headings and buttons in this single fieldset, instead of separate fields in Statamic for each element.
 - Through the (+) in the Bard editor, editors can add sets: `text`, `buttons` and `title`.
@@ -121,6 +126,7 @@ Available slots: `prose`, `buttons`, `button`, `title` (only when explicitly req
 ```
 
 #### Supporting a new Bard set inside content
+
 To make a new set available through the (+) in the Bard editor, extend the content fieldset component itself (`resources/views/components/fieldset/content.blade.php`), not the place where it is used. This is a global change, so ask first.
 
 Follow the pattern of the existing branches in the `@foreach`:
@@ -140,6 +146,7 @@ Follow the pattern of the existing branches in the `@foreach`:
 The field name (`$data->image`) must match the field in the set's configuration.
 
 ### media
+
 For an image or video.
 - The alt text comes from the asset in Statamic.
 - Options such as object fit, video behavior (autoplay, muted, loop, controls), loading (lazy/eager) and a separate mobile asset are handled inside the fieldset.
@@ -150,6 +157,7 @@ For an image or video.
 ```
 
 ### button
+
 When exactly one button is needed. Built on `link`. If more buttons are needed, use `buttons`.
 
 ```blade
@@ -158,6 +166,7 @@ When exactly one button is needed. Built on `link`. If more buttons are needed, 
 ```
 
 ### buttons
+
 When the editor must be able to configure multiple buttons. Built on `button`. If only one button is needed, use `button`.
 
 ```blade
@@ -173,6 +182,7 @@ Classes on the individual buttons can be changed through the `button` slot (only
 ```
 
 ### link
+
 Makes another element or fieldset clickable, such as an image or an entire card. It is not a text link: text links belong in `content`.
 - Wrap the link around the fieldset(s) that should become clickable.
 - Without an href, the link renders as a `div`, so the content still shows.
@@ -185,6 +195,7 @@ Makes another element or fieldset clickable, such as an image or an entire card.
 ```
 
 #### No links inside a link
+
 An `<a>` inside an `<a>` is invalid HTML and causes unpredictable browser behavior. This easily happens with a clickable card containing a button, because `button` already contains a `link`.
 
 - When a `button` sits inside a `link` wrapper, give it `:link="false"`. The button then renders as a `<span>` with the same styling.
@@ -199,6 +210,7 @@ An `<a>` inside an `<a>` is invalid HTML and causes unpredictable browser behavi
 ```
 
 ### icon
+
 For an icon. The source from Statamic is always an `.svg`, rendered inline.
 - A size and a text color on the call are allowed (see Which classes are allowed).
 - Icons are decorative by default and hidden from screen readers with `aria-hidden="true"`.
@@ -210,6 +222,7 @@ For an icon. The source from Statamic is always an `.svg`, rendered inline.
 ```
 
 ### accordion
+
 For collapsible elements such as questions and answers. The question/title is always visible; clicking it opens the answer. Built on the Rapidez accordion, which uses `<details>` and `<summary>`.
 
 ```blade
