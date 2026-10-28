@@ -20,7 +20,7 @@ A design is a picture of the result, not code to copy. This applies to a handoff
 - **Buttons, inputs, accordions**: map them to the Rapidez components and override those components to match the design (see Rapidez components in Step 1); a style that does not match any variant becomes a new variant.
 - **Typography**: map headings to `text-h1` to `text-h4` and body text to prose.
 - **Icons**: find out which icon set the design uses (a Claude Design export often uses Lucide, recognizable by `data-lucide` attributes) and use the matching blade-icons pack (see Icons in Step 1), never copied SVGs.
-- **Images and decorations**: prefer SVG over PNG or JPG for everything that is not a photo: logos, patterns, borders, shapes and illustrations. When the design only provides a raster file for something that is vector by nature, ask for the SVG; if it is not available yet, use the raster file temporarily and report it.
+- **Images and decorations**: prefer SVG over PNG or JPG for everything that is not a photo: logos, patterns, borders, shapes and illustrations. When the design only provides a raster file for something that is vector by nature, ask for the SVG; if it is not available yet, use the raster file temporarily and report it. Decorative SVG shapes that the design has inline in its markup (waves, blobs, dividers) become a file in `resources/svg`, rendered with `<x-icon-…>` and only layout and color classes (`<x-icon-wave class="-mb-px block h-14 w-full text-primary md:h-24" />`), never pasted into the template. Name the file after the shape, not the element it was first used in.
 - **Breakpoints**: a design often shows one or two breakpoints. Build mobile, tablet and desktop anyway; derive the missing ones from the components' behavior and mention them in the report.
 - **Behavior is part of the design**: the prototype's JavaScript shows how things work: what opens on hover or click, what stays open and what closes it, where a click navigates, and keyboard support. Rebuild that behavior exactly, but with native HTML and CSS first: `popover`, `<dialog>`, invoker commands (`commandfor`/`command`), anchor positioning and `:has()`. Use JavaScript (Alpine or Vue, whichever the project uses) only for what native HTML and CSS cannot do, such as opening on hover and staying open after the mouse leaves. Never change the behavior to avoid JavaScript without asking.
 - **Mobile and desktop differ**: when the same element looks different per breakpoint without a clear reason (e.g. a language switch), ask which version is leading instead of building both.
@@ -61,10 +61,11 @@ Check the main CSS file:
 2. Choose the brand colors by how often they occur: the most used brand color is `primary`, the second `secondary`. An extra brand color becomes `accent`.
 3. Choose `conversion` for the site's main goal (see Colors in the guideline).
 4. Map text, background and border colors to the neutral scale: emphasis, default, muted.
-5. Raw values may live in `@theme`. Only when a project has multiple themes (per site or variant) do they live in `:root` and theme selectors, so they can be overridden.
-6. Define every token the Rapidez components, the fieldsets and the existing templates use (e.g. `hover:border-emphasis`, `bg-muted`, `text-primary-text`), even if the design does not show that state, otherwise those states silently do nothing. Derive missing values sensibly from the design (e.g. emphasis slightly darker than default) and list them in your report.
-7. Check that every token mapped in `@theme` is defined. A mapping to an undefined variable silently produces no color.
-8. Report color combinations that do not meet the contrast requirements.
+5. Rename the design's own color names to the Primer names: lighter variants become `-muted`, darker ones `-emphasis` (e.g. `--color-secondary-tint` → `--color-secondary-muted`, `--color-type-kdv-soft` → `--color-type-kdv-muted`).
+6. Raw values may live in `@theme`. Only when a project has multiple themes (per site or variant) do they live in `:root` and theme selectors, so they can be overridden.
+7. Define every token the Rapidez components, the fieldsets and the existing templates use (e.g. `hover:border-emphasis`, `bg-muted`, `text-primary-text`), even if the design does not show that state, otherwise those states silently do nothing. Derive missing values sensibly from the design (e.g. emphasis slightly darker than default) and list them in your report.
+8. Check that every token mapped in `@theme` is defined. A mapping to an undefined variable silently produces no color.
+9. Report color combinations that do not meet the contrast requirements.
 
 ### 2. Buttons
 
@@ -211,18 +212,26 @@ Header and footer:
 - Navigation items that need extra content, such as an icon and a description in a mega menu, get a navigation blueprint in `resources/blueprints/navigation/{handle}.yaml` (import `icon`, plus the extra fields), and the navigation gets `collections` and `max_depth` in `content/navigation/{handle}.yaml`.
 - Multisite: a language switch is configured in the `header` global (which sites it shows, on or off per site) and links to the current page in the other site (the `locales` tag with the current `id`), falling back to that site's home. Enable every global and collection a page uses for every site. With sites on several domains, every site URL is absolute (derive it from `APP_URL`), and a link to a page on another site uses a link field with `select_across_sites: true`; otherwise it renders as a relative URL on the current domain.
 - Globals in the Blade cascade (`$header`, `$brand`) are already resolved values (strings, booleans, `Values`, entries, assets): do not call `?->value()` on them, unlike the fields of a pagebuilder set. Read them with `??` like every value that may not exist (see Templates in the guideline): a global that is not enabled for a site is missing from the cascade.
-- The layout (`layouts/app.blade.php`) includes the header and has `lang` from the current site, a skip link to `<main id="content">`, the scroll-lock class on `<html>` and `@stack('foot')`.
+- The layout (`layouts/app.blade.php`) includes the header and footer and has `lang` from the current site, a skip link to `<main id="content">`, the scroll-lock class on `<html>` and `@stack('foot')`.
 
-### Large templates
+### Partials
 
-Keep every template small enough to read in one go. When a fixed element or component grows beyond roughly 150 lines, or contains clearly separate parts (for a header: desktop menu, mega menus, mobile menu, search dialog), split it into partials and `@include` them from the main file.
+Split a fixed element or component into partials when it contains clearly separate parts, whatever its length, and `@include` them from the main file. Size is a second reason: a template beyond roughly 150 lines is split even when its parts are less distinct. A short file is never a reason to keep separate parts together.
 
-- The main file keeps the shared `@php` block and the overall structure, and includes the parts in order.
-- Partials of a fixed element live in a folder with its name: `resources/views/layouts/header.blade.php` includes `layouts.header.navigation`, `layouts.header.mega-menu`, `layouts.header.mobile-menu`, `layouts.header.search`.
+Examples of separate parts:
+- Header: desktop navigation, mega menus, mobile menu, search dialog, quick actions.
+- Footer: logo, contact links, socials, partners, legal row.
+- A pagebuilder component with a filter, a list and a detail panel.
+
+How to split:
+- The main file keeps the shared `@php` block, the overall structure and decoration that frames the parts (e.g. a wave edge or strip), and includes the parts in order.
+- Partials of a fixed element live in a folder with its name: `resources/views/layouts/header.blade.php` includes `layouts.header.navigation`, `layouts.header.mega-menu`, `layouts.header.mobile-menu`, `layouts.header.search`; `layouts/footer.blade.php` includes `layouts.footer.logo`, `layouts.footer.contact`, `layouts.footer.legal`.
 - Partials of a pagebuilder component live in a folder with its handle: `resources/views/page_builder/{handle}/`.
 - Name partials after the part they render, in kebab-case and English.
+- A partial or asset that several elements use (e.g. the strip above the header and below the footer) lives outside their folders and is named after what it is, not after the element it was first built for: `layouts.strip` and `resources/images/strip.png`, not `layouts.header.strip` or `header-strip.png`. Rename it when an element-specific part becomes shared.
 - Partials are `@include`d files, not Blade components. Pass what a partial needs explicitly, e.g. `@include('layouts.header.mega-menu', ['item' => $item])`, so it is clear where its data comes from. Variables set inside a partial do not reach the file that includes it: define variables that several partials need in the main file's `@php` block.
-- Split by part, not by line count alone: a partial should make sense on its own.
+- Each partial checks its own data and renders nothing when it is empty, so the main file does not repeat those checks.
+- A partial should make sense on its own: split by part, not at an arbitrary line.
 
 ### Components, one at a time
 
@@ -235,7 +244,7 @@ Zoom in on one component and decide, per visible element, where it comes from:
 
 Look at the mobile and tablet versions of the component before choosing. How elements move, stack or disappear on smaller screens can decide how you group them and which fieldsets you use. <!-- TODO: confirm with the developer what the responsive views can decide -->
 
-Then build the component with the `statamic-pagebuilder-components` skill, and add its spacing exceptions if the design needs them. If it grows large, split it as described in Large templates.
+Then build the component with the `statamic-pagebuilder-components` skill, and add its spacing exceptions if the design needs them. When it has clearly separate parts or grows large, split it as described in Partials.
 
 When the component uses a foundation element (a button, input, select or label), compare it with the design in this component as well. If it differs, fix the override from Step 1, so it is right everywhere; do not patch it with classes on the call.
 
@@ -282,7 +291,7 @@ Finish with a short report:
 10. **Always report.** Including color choices, derived values, accessibility issues and content that still needs to be filled in.
 11. **Icons from a blade-icons pack.** Custom SVG icons only when no pack has the icon.
 12. **SVG before raster.** PNG or JPG only for photos, or temporarily when the SVG is not available yet (and reported).
-13. **Split large templates into partials.** Separate parts of a large fixed element or component go into `@include`d partials, so every file stays readable.
+13. **Split by part.** Every clearly separate part of a fixed element or component is an `@include`d partial, whatever the file's length; beyond roughly 150 lines a template is split anyway.
 14. **Override vendor components to match the design.** The look of Rapidez components is changed in overrides in `resources/views/vendor/rapidez/components/`, never in `vendor`, and never left at the vendor defaults when the design differs.
 15. **Compare, never assume.** Every foundation element, including existing overrides, is compared with the design's markup and checked in the browser.
 16. **The design's Tailwind values are leading**, read through the design's own theme. Only colors are translated, to tokens.
@@ -312,7 +321,7 @@ Finish with a short report:
 - [ ] Every variant of a fixed element (per site or section) collected from all pages of the design and compared with the build, content included
 - [ ] No styling in CSS files that Tailwind classes in the template can express
 - [ ] No empty spacer or helper elements copied from the design; spacing solved with layout utilities on real elements
-- [ ] Large templates split into partials per part; no file you can't read in one go
+- [ ] Fixed elements and components split into partials per part (not only when large); no file you can't read in one go
 - [ ] Every component built with fieldsets wherever possible, checked on mobile, tablet and desktop, including the foundation elements it uses
 - [ ] Every interactive state clicked through in the browser at mobile, tablet and desktop, against a production build, on every site
 - [ ] Pages, globals, navigation and forms set up in Statamic as in the design; first title is `page-title` with `h1`
