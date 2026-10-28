@@ -40,7 +40,7 @@ The foundation everything else uses. Work in this order, and skip only what you 
 
 ### Rapidez components
 
-The look of buttons, form fields, labels and accordions lives in the Rapidez blade components, and overriding them is the expected way to match a design. Copy the component from `vendor/rapidez/blade-components/resources/views/components/` to the same path under `resources/views/vendor/rapidez/components/` and change it there; never edit the `vendor` folder. Note at the top of the override what was changed (`{{-- Overwritten to: ... --}}`), as the existing overrides do.
+The look of buttons, form fields, labels and accordions lives in the Rapidez blade components, and overriding them is the expected way to match a design. Copy the component from `vendor/rapidez/blade-components/resources/views/components/` to the same path under `resources/views/vendor/rapidez/components/` and change it there; never edit the `vendor` folder. Note at the top of the override what was changed (`{{-- Overwritten to: ... --}}`), as the existing overrides do. This is the only comment allowed: the project's own files (partials, components, CSS, JS) get no comments, not at the top and not inline.
 
 ### CSS setup
 
@@ -72,7 +72,7 @@ Check the main CSS file:
 Override the Rapidez buttons in `resources/views/vendor/rapidez/components/button/` (see `rapidez-blade-components`).
 - Put everything all buttons share (height, padding, radius, font, transition) in `base`, with the design's Tailwind values.
 - The variants only add colors. The primary button uses the `primary` color, the secondary button `secondary`, the conversion button `conversion`.
-- An extra button style from the design becomes a new variant next to the others. First translate the design's classes and compare them with every existing variant, including `outline`; only add a variant when none matches. Name it after how it looks (`subtle`, `filled`), never after a page, a place or a color, and describe its purpose in the comment at the top.
+- An extra button style from the design becomes a new variant next to the others. First translate the design's classes and compare them with every existing variant, including `outline`; only add a variant when none matches. Name it after how it looks (`subtle`, `filled`), never after a page, a place or a color.
 - The `button_variant` select in `resources/fieldsets/button.yaml` and the match in the button fieldset component offer every variant editors may need, including `conversion` when a CMS button is the site's main goal.
 - The icon size in the button fieldset component (`components/fieldset/button.blade.php`) matches the size of the icons in the design's buttons (e.g. `size-5`). Compare it like the other button classes; the fieldset renders every CMS button icon at that one size.
 
@@ -229,7 +229,8 @@ How to split:
 - Partials of a pagebuilder component live in a folder with its handle: `resources/views/page_builder/{handle}/`.
 - Name partials after the part they render, in kebab-case and English.
 - A partial or asset that several elements use (e.g. the strip above the header and below the footer) lives outside their folders and is named after what it is, not after the element it was first built for: `layouts.strip` and `resources/images/strip.png`, not `layouts.header.strip` or `header-strip.png`. Rename it when an element-specific part becomes shared.
-- Partials are `@include`d files, not Blade components. Pass what a partial needs explicitly, e.g. `@include('layouts.header.mega-menu', ['item' => $item])`, so it is clear where its data comes from. Variables set inside a partial do not reach the file that includes it: define variables that several partials need in the main file's `@php` block.
+- Partials are `@include`d without variables: `@include('layouts.header.mega-menu')`, never `@include(…, ['item' => $item])` or `['class' => …]`. A partial reads its data from the including file's scope: the variables in the main file's `@php` block, or the loop variable of the `@foreach` around the include. Variables set inside a partial do not reach the file that includes it, so define variables that several partials need in the main file's `@php` block.
+- Something used in several places, or with different classes per place (a language switch, a location search form), is not a partial but an anonymous Blade component in `resources/views/components/`, with `@props` for its data and `$attributes->twMerge(...)` for the classes of each call: `<x-language-switch :languages="$languages" class="max-md:hidden" />`.
 - Each partial checks its own data and renders nothing when it is empty, so the main file does not repeat those checks.
 - A partial should make sense on its own: split by part, not at an arbitrary line.
 
@@ -291,7 +292,7 @@ Finish with a short report:
 10. **Always report.** Including color choices, derived values, accessibility issues and content that still needs to be filled in.
 11. **Icons from a blade-icons pack.** Custom SVG icons only when no pack has the icon.
 12. **SVG before raster.** PNG or JPG only for photos, or temporarily when the SVG is not available yet (and reported).
-13. **Split by part.** Every clearly separate part of a fixed element or component is an `@include`d partial, whatever the file's length; beyond roughly 150 lines a template is split anyway.
+13. **Split by part.** Every clearly separate part of a fixed element or component is an `@include`d partial, whatever the file's length; beyond roughly 150 lines a template is split anyway. Partials are included without variables; reusable parts are components.
 14. **Override vendor components to match the design.** The look of Rapidez components is changed in overrides in `resources/views/vendor/rapidez/components/`, never in `vendor`, and never left at the vendor defaults when the design differs.
 15. **Compare, never assume.** Every foundation element, including existing overrides, is compared with the design's markup and checked in the browser.
 16. **The design's Tailwind values are leading**, read through the design's own theme. Only colors are translated, to tokens.
@@ -322,6 +323,8 @@ Finish with a short report:
 - [ ] No styling in CSS files that Tailwind classes in the template can express
 - [ ] No empty spacer or helper elements copied from the design; spacing solved with layout utilities on real elements
 - [ ] Fixed elements and components split into partials per part (not only when large); no file you can't read in one go
+- [ ] No comments in the project's own files; only vendor overrides have their `Overwritten to` line
+- [ ] No variables passed to `@include`; parts used in several places or with different classes are components with `@props` and `twMerge`
 - [ ] Every component built with fieldsets wherever possible, checked on mobile, tablet and desktop, including the foundation elements it uses
 - [ ] Every interactive state clicked through in the browser at mobile, tablet and desktop, against a production build, on every site
 - [ ] Pages, globals, navigation and forms set up in Statamic as in the design; first title is `page-title` with `h1`
