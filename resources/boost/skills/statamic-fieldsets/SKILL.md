@@ -42,6 +42,8 @@ Every fieldset hides its rarely used settings, so editors only see what they rea
 
 Options are handled entirely inside the fieldset component. You never have to do anything with them in a template; just pass the fieldset variable.
 
+A revealer only shows and hides fields in the CP: Statamic never saves its value, so a template that reads it sees "off" after the first save in the CP. Never read a revealer in a template. When the template must know whether a feature is on (a video, a location search), use a `toggle` field with `if: {toggle}: 'equals true'` on the fields it reveals; it behaves the same in the CP and its value is saved.
+
 ## Composition
 
 Some fieldsets are built on top of other fieldsets or on Rapidez blade components:
@@ -108,6 +110,7 @@ A heading where the editor chooses the level (h1 to h6) or strong.
 
 For larger amounts of text: blog posts, but also most text blocks within components.
 - Prefer combining text, headings and buttons in this single fieldset, instead of separate fields in Statamic for each element.
+- Everything that sits in the text flow, between or after the text, is a Bard set in `content`, never a separate field on the component: buttons, pills (e.g. value items with an icon and a short text), small lists. Editors then decide the order and can leave it out. When no existing set fits, propose a new set (see Supporting a new Bard set inside content) instead of a field on the component. Separate fields are only for elements with a fixed place outside the text flow, such as an eyebrow above the title, or the media.
 - Through the (+) in the Bard editor, editors can add sets: `text`, `buttons` and `title`.
 - Typography comes from prose (see Typography in the guideline).
 - Space between the sets is handled in `spacing.css` through `.fieldset-content + .fieldset-content`. Every set gets the `fieldset-content` class for this; do not add margins between them yourself.
@@ -253,10 +256,11 @@ Styling of the label and content through slots (only when explicitly requested):
 | Large title at the top of a block | `title` |
 | Subheading, card title | `heading` |
 | Text, optionally with headings and buttons | `content` |
+| Buttons, pills or a short list in the text column, below or between the text | a set in `content` (existing `buttons` set, or propose a new set) |
 | Short plain text where editors must not add headings or buttons | no fieldset: a text field on the component (see `statamic-pagebuilder-components`) |
 | Standalone image or video | `media` |
-| One standalone button | `button` |
-| Multiple buttons side by side | `buttons` |
+| One button with a fixed place outside the text flow (e.g. on a card) | `button` |
+| Multiple buttons with a fixed place outside the text flow | `buttons` |
 | Clickable image or card | `link` around the relevant fieldset(s) |
 | Text link within body text | `content` |
 | Icon | `icon` |
@@ -271,6 +275,8 @@ Styling of the label and content through slots (only when explicitly requested):
 5. **Fix the look at the lowest level, never locally.** If a fieldset does not match the design, change the component it is built on (fieldset or Rapidez component), so it looks identical in every template.
 6. **No slots unless explicitly requested.** Slots are a developer tool, not a way to match a design.
 7. **No nested links.** Invalid HTML breaks behavior and accessibility.
+8. **Text flow goes into `content`.** Buttons, pills and small lists in the text column are Bard sets, not separate fields on the component.
+9. **Never read a revealer in a template.** Its value is not saved; use a `toggle` with `if` conditions for features the template must know about.
 
 ## Checklist before delivery
 
@@ -282,5 +288,7 @@ Styling of the label and content through slots (only when explicitly requested):
 - [ ] Design deviations solved in the component at the lowest level, not locally
 - [ ] No slots used, unless explicitly requested
 - [ ] No nested links: buttons inside a `link` have `:link="false"`, no `content` inside a `link`
+- [ ] Buttons, pills and small lists in the text column are sets in `content`, not separate component fields
+- [ ] No template reads a revealer; features the template checks use a `toggle` with `if` conditions
 - [ ] Accordions that allow one open item have a `name` unique to the component
 - [ ] Links without visible text: developer reminded to fill in the aria-label in Statamic

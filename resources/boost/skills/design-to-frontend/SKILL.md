@@ -238,9 +238,10 @@ How to split:
 
 Zoom in on one component and decide, per visible element, where it comes from:
 - a fieldset (see the decision guide in `statamic-fieldsets`). Use fieldsets wherever possible, because they keep everything consistent;
+- a set in the `content` fieldset, for everything in the text flow below or between the text: buttons, pills, small lists. Not a separate field on the component, even when the design annotates it as one (e.g. `{{ $buttons }}` or a `value_items` replicator next to the content);
 - a plain text field on the component, only when a fieldset is more than needed (e.g. a short text without headings or buttons);
 - repeating items (cards, tiles, usps), for a list of the same kind of element (see Repeating items in `statamic-pagebuilder-components`);
-- a component option, for a layout choice the editor makes;
+- a component option, for a layout choice the editor makes. A feature with its own fields that is only sometimes used (a video, a location search) gets a `toggle` that reveals its fields, never a revealer (see Which fields are visible in `statamic-pagebuilder-components`);
 - not the CMS at all, for fixed UI such as slider arrows (Rapidez components).
 
 Look at the mobile and tablet versions of the component before choosing. How elements move, stack or disappear on smaller screens can decide how you group them and which fieldsets you use. <!-- TODO: confirm with the developer what the responsive views can decide -->
@@ -326,6 +327,7 @@ Finish with a short report:
 - [ ] No comments in the project's own files; only vendor overrides have their `Overwritten to` line
 - [ ] No variables passed to `@include`; parts used in several places or with different classes are components with `@props` and `twMerge`
 - [ ] Every component built with fieldsets wherever possible, checked on mobile, tablet and desktop, including the foundation elements it uses
+- [ ] Buttons, pills and small lists in the text column are sets in `content`; optional features use a `toggle` with `if` conditions, not a revealer
 - [ ] Every interactive state clicked through in the browser at mobile, tablet and desktop, against a production build, on every site
 - [ ] Pages, globals, navigation and forms set up in Statamic as in the design; first title is `page-title` with `h1`
 - [ ] Exactly one `h1` per page, no skipped heading levels

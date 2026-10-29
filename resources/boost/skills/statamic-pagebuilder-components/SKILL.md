@@ -55,10 +55,12 @@ Wrong: `text_image` (should be `content_media`), `category_tiles` or `image_slid
 ```
 
 ### Outer element
+
 - Classes: `component`, the type class, and optionally modifiers.
 - May be a `<section>` instead of a `<div>` when that is semantically correct.
 
 ### Modifiers
+
 A modifier is an extra class on the outer element that always comes from a Statamic option, never hardcoded. Add it with `@class`. `spacing.css` can use modifiers to adjust spacing.
 
 ```blade
@@ -69,12 +71,14 @@ A modifier is an extra class on the outer element that always comes from a Stata
 ```
 
 ### Container
+
 - The second element has only the class `container`.
 - Always use it, unless a Statamic option says otherwise (e.g. a fullscreen option on a banner).
 - Use `md:container` when content must sit in the container on desktop but run edge to edge on mobile.
 - You do not need to know whether the component is rendered inside another container: nested containers lose their padding through CSS.
 
 ### Inside the container
+
 Use any HTML the layout needs, and fieldsets for all content.
 
 ## Fields
@@ -82,14 +86,18 @@ Use any HTML the layout needs, and fieldsets for all content.
 A component consists mainly of fieldsets. It may also have its own fields: layout options of this component (such as a background or a fullscreen option), or a short plain text (see below). Give them descriptive handles (`mirror`, not `toggle`).
 
 ### Content fieldset or text field
+
 Use the `content` fieldset for text, unless editors must not be able to add headings or buttons, such as a short subtitle or description. Then use a plain text field on the component, and render it with `<x-prose>` so the typography stays the same:
 
 ```blade
 <x-prose>{{ $description?->value() }}</x-prose>
 ```
 
+Buttons, pills and small lists that sit in the text column, below or between the text, are sets in the `content` fieldset, not fields on the component (see `content` in `statamic-fieldsets`). Do not add a `buttons` import or a replicator for them to the component.
+
 ### Repeating items
-Lists of the same kind of element (cards, tiles, usps, logos) are a replicator field, so editors can add, remove and reorder items.
+
+Lists of the same kind of element (cards, tiles, usps, logos) are a replicator field, so editors can add, remove and reorder items. This is for lists that form their own part of the layout, such as a grid of cards; a short list inside the text column is a set in `content`.
 
 - Field type: always `replicator`.
 - Name: `{name}_items`, e.g. `card_items`, `usp_items`. Use this for every new component, so all lists are recognizable.
@@ -134,6 +142,7 @@ field:
 ```
 
 ### Variables in the template
+
 `page_builder.blade.php` includes each component with all fields of its set as variables, including the set's unique `$id`. Each fieldset arrives as one variable with the same name (see the `statamic-fieldsets` skill).
 
 Do not wrap the whole component in an empty-content check. Editors can disable a component in Statamic, and an empty component should be removed by the editor.
@@ -218,9 +227,32 @@ title_media:
 3. **Translations**: add Dutch translations for new display names to `nl.json`.
 
 ### Which fields are visible
+
 Editors should only see what they really need:
 - Fields that are filled in or changed for most uses of the component are directly visible.
 - Fields the design rarely uses go into the component options: a toggle with handle `options` (display "Component options") that reveals a group with handle `component_options`.
+- A feature that is off unless the editor turns it on, with its own fields (a video, a location search), gets a `toggle` field (`show_video`) inside the component options, and its fields get `if: show_video: 'equals true'`. The template checks the toggle. Never use a revealer for this: Statamic does not save a revealer's value, so after the first save in the CP the template sees the feature as off.
+
+```yaml
+-
+  handle: show_video
+  field:
+    type: toggle
+    display: Video
+-
+  handle: video
+  field:
+    type: video
+    display: 'Video link'
+    if:
+      show_video: 'equals true'
+```
+
+```blade
+$video = ($options->show_video ?? false) ? ($options->video ?? null) : null;
+```
+
+Inside the `component_options` group, toggle and text values arrive as plain values, select values as `LabeledValue` (read them with `?->value()`) and nested groups as `Values`: `($options->decoration ?? null)?->value()`, `$options->show_video ?? false`.
 
 ## Hard rules
 
@@ -245,4 +277,6 @@ Editors should only see what they really need:
 - [ ] Shorthand variables in `@php` at the top
 - [ ] `component_{handle}.yaml` created and set added to the `page_builder` replicator
 - [ ] Rarely used fields in `component_options`
+- [ ] Buttons, pills and small lists in the text column are sets in `content`, not component fields
+- [ ] Optional features with their own fields use a `toggle` with `if` conditions; no template reads a revealer
 - [ ] Dutch translations added to `nl.json`
