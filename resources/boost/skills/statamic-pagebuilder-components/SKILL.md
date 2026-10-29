@@ -87,11 +87,13 @@ A component consists mainly of fieldsets. It may also have its own fields: layou
 
 ### Content fieldset or text field
 
-Use the `content` fieldset for text, unless editors must not be able to add headings or buttons, such as a short subtitle or description. Then use a plain text field on the component, and render it with `<x-prose>` so the typography stays the same:
+Use the `content` fieldset for text, unless editors must not be able to add headings or buttons, such as a short description. Then use a plain text field on the component, and render it with `<x-prose>` so the typography stays the same:
 
 ```blade
 <x-prose>{{ $description?->value() }}</x-prose>
 ```
+
+A short label above the title (eyebrow) is not a text field but the `heading` fieldset, rendered with `<x-eyebrow>` (see Label above a title in `statamic-fieldsets`).
 
 Buttons, pills and small lists that sit in the text column, below or between the text, are sets in the `content` fieldset, not fields on the component (see `content` in `statamic-fieldsets`). Do not add a `buttons` import or a replicator for them to the component.
 

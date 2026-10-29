@@ -54,6 +54,7 @@ Check the main CSS file:
 - **Styling lives in Tailwind classes in the template**, not in CSS files. That includes states and positioning: `open:` for an open popover or dialog, `starting:` with `transition-discrete` for enter and exit animations, `backdrop:`, `group-has-[…]` and arbitrary variants such as `[body:has(…)_&]:` for state elsewhere on the page, and arbitrary properties such as `[position-anchor:--header-bar]`. A CSS file is only for what Tailwind cannot express: tokens, fonts, keyframes, prose, spacing between components, shared fallbacks and markup you do not control.
 - A popover is rendered in the top layer, so `absolute` inside its parent does not position it. To place a panel against an element (e.g. under the header bar), give that element an `[anchor-name:--…]` and the panel `anchored inset-auto m-0 [position-anchor:--…] [position-area:…]` plus a margin for the gap: `[position-area:bottom_center] w-full` for the full width of the anchor (`w-full` is then the anchor's width), `[position-area:bottom_span-left]` to align with its right edge. No `anchor()` calculations and no `not-supports-[…]:` classes per panel: the `anchored` class (`resources/css/components/popover.css`) shows the panel centred, like a native popover, in browsers without anchor positioning.
 - A display utility (`grid`, `flex`, `block`) on a `[popover]` or `<dialog>` overrides the browser's hidden state, so the element stays visible when closed. Use `open:grid` instead.
+- **Animations** live in `resources/css/animations.css`, imported in the main CSS file, inside `@theme` as an `--animate-{name}` token with its `@keyframes`. Use them as Tailwind classes (`animate-ring`, `after:animate-ring`) or as `var(--animate-…)` in a CSS file, never as `@keyframes` in a component's CSS file. Name an animation after its movement (`ring`, `float`), not after the element it was first used on. Handle `prefers-reduced-motion` where the animation is used (`motion-reduce:animate-none`, or `animation: none` in a `prefers-reduced-motion: reduce` media query).
 - **No empty elements for layout.** A design's markup can contain helpers such as an empty spacer (`<div class="flex-1 xl:hidden"></div>`). Don't copy them: solve the spacing with layout utilities on the real elements, e.g. `max-xl:ml-auto` on the first element of the right-hand group, `flex-1` on an element that is there anyway, `justify-between` or `gap`.
 
 ### 1. Colors
@@ -240,7 +241,7 @@ How to split:
 Zoom in on one component and decide, per visible element, where it comes from:
 - a fieldset (see the decision guide in `statamic-fieldsets`). Use fieldsets wherever possible, because they keep everything consistent;
 - a set in the `content` fieldset, for everything in the text flow below or between the text: buttons, pills, small lists. Not a separate field on the component, even when the design annotates it as one (e.g. `{{ $buttons }}` or a `value_items` replicator next to the content);
-- a plain text field on the component, only when a fieldset is more than needed (e.g. a short text without headings or buttons);
+- a plain text field on the component, only when a fieldset is more than needed (e.g. a short text without headings or buttons). Not a label above a title (eyebrow), even when the design marks it as a text field: that is the `heading` fieldset with `<x-eyebrow>` (see `statamic-fieldsets`);
 - repeating items (cards, tiles, usps), for a list of the same kind of element (see Repeating items in `statamic-pagebuilder-components`);
 - a component option, for a layout choice the editor makes. A feature with its own fields that is only sometimes used (a video, a location search) gets a `toggle` that reveals its fields, never a revealer (see Which fields are visible in `statamic-pagebuilder-components`);
 - not the CMS at all, for fixed UI such as slider arrows (Rapidez components).
@@ -301,6 +302,7 @@ Finish with a short report:
 17. **No custom border radius.** Standard `rounded-*` classes only; `corner-shape` is allowed when the design uses it.
 18. **Same behavior, least JavaScript.** Rebuild the design's interactions exactly; native HTML and CSS first, JavaScript only for what they cannot do.
 19. **Styling in the template.** Tailwind classes in Blade; a CSS file only for what Tailwind cannot express.
+20. **Animations in `animations.css`.** An `--animate-*` token with its `@keyframes` in `@theme`, named after the movement, with reduced motion handled.
 
 ## Checklist before delivery
 
@@ -324,6 +326,7 @@ Finish with a short report:
 - [ ] Page-dependent states (active menu item and its parent, active filters, selected tabs) taken from the pages where they apply
 - [ ] Every variant of a fixed element (per site or section) collected from all pages of the design and compared with the build, content included
 - [ ] No styling in CSS files that Tailwind classes in the template can express
+- [ ] Animations in `animations.css` (`--animate-*` + `@keyframes` in `@theme`), named after the movement, with `prefers-reduced-motion` handled
 - [ ] No empty spacer or helper elements copied from the design; spacing solved with layout utilities on real elements
 - [ ] Fixed elements and components split into partials per part (not only when large); no file you can't read in one go
 - [ ] No comments in the project's own files; only vendor overrides have their `Overwritten to` line
