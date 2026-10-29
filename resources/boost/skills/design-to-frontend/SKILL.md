@@ -207,9 +207,9 @@ Header and footer:
   - global `brand`: shared brand elements such as the logo;
   - global `header` and global `footer`: loose elements such as USPs or contact details;
   - navigations `header_main_navigation` and `footer_navigation`.
-- If the `header` or `footer` global does not exist yet, create it with the fields the design needs: the global set in `content/globals/{handle}.yaml` and its blueprint in `resources/blueprints/globals/{handle}.yaml`. Use fieldsets for the fields where possible, and add Dutch translations for display names to `nl.json`.
+- If the `header` or `footer` global does not exist yet, create it with the fields the design needs: the global set in `content/globals/{handle}.yaml` and its blueprint in `resources/blueprints/globals/{handle}.yaml`. Use fieldsets for the fields where possible, and add Dutch translations to `nl.json` for every display name, instruction and option label.
 - Everything visible comes from Statamic: menu items, button texts and variants, labels and placeholders. Texts that are only read by screen readers (`aria-label`, the skip link) use `__()` with a translation in `nl.json`.
-- Translations in `nl.json` (display names and screen-reader texts) are kept sorted A-Z by key, case-insensitive: add new keys in their place instead of at the end, and check afterwards that the file is still valid JSON.
+- Translations in `nl.json` (display names, instructions, option labels and screen-reader texts) are kept sorted A-Z by key, case-insensitive: add new keys in their place instead of at the end, and check afterwards that the file is still valid JSON.
 - A button whose text, link or variant comes from Statamic is always rendered with `<x-fieldset.button>`, never with a hardcoded `<x-rapidez::button.{variant}>`, so the variant the editor selects works. When the button must be a `<button>` instead of a link, such as a popover trigger or a form submit, put the attribute on the fieldset itself: with `type`, `popovertarget` or `commandfor` it renders a `<button>` (`<x-fieldset.button :button="$header->quick_action_button ?? null" popovertarget="quick-actions" />`, `<x-fieldset.button :button="$search['button'] ?? null" type="submit" />`). No `<button>` wrapper around it. Rapidez buttons are only used directly for fixed UI without content from Statamic (search, menu, close). A button that does the same thing in several places (e.g. a desktop header button and a floating mobile button that open the same quick actions) uses one button field, styled as on desktop, so the editor fills it in once. Differences per breakpoint are only layout classes on the call (position, height), not a second field.
 - Navigation items that need extra content, such as an icon and a description in a mega menu, get a navigation blueprint in `resources/blueprints/navigation/{handle}.yaml` (import `icon`, plus the extra fields), and the navigation gets `collections` and `max_depth` in `content/navigation/{handle}.yaml`.
 - Multisite: a language switch is configured in the `header` global (which sites it shows, on or off per site) and links to the current page in the other site (the `locales` tag with the current `id`), falling back to that site's home. Enable every global and collection a page uses for every site. With sites on several domains, every site URL is absolute (derive it from `APP_URL`), and a link to a page on another site uses a link field with `select_across_sites: true`; otherwise it renders as a relative URL on the current domain.
@@ -243,7 +243,8 @@ Zoom in on one component and decide, per visible element, where it comes from:
 - a set in the `content` fieldset, for everything in the text flow below or between the text: buttons, pills, small lists. Not a separate field on the component, even when the design annotates it as one (e.g. `{{ $buttons }}` or a `value_items` replicator next to the content);
 - a plain text field on the component, only when a fieldset is more than needed (e.g. a short text without headings or buttons). Not a label above a title (eyebrow), even when the design marks it as a text field: that is the `heading` fieldset with `<x-eyebrow>` (see `statamic-fieldsets`);
 - repeating items (cards, tiles, usps), for a list of the same kind of element (see Repeating items in `statamic-pagebuilder-components`);
-- a component option, for a layout choice the editor makes. A feature with its own fields that is only sometimes used (a video, a location search) gets a `toggle` that reveals its fields, never a revealer (see Which fields are visible in `statamic-pagebuilder-components`);
+- a component option, for a layout choice the editor makes (decoration, theme, ratio);
+- a fieldset with a `show_{feature}` toggle, for a feature with its own content fields that is only sometimes used, such as a video on the media. It is imported right after the fieldset it extends, never placed in the component options, and never behind a revealer (see Which fields are visible in `statamic-pagebuilder-components`);
 - not the CMS at all, for fixed UI such as slider arrows (Rapidez components).
 
 Look at the mobile and tablet versions of the component before choosing. How elements move, stack or disappear on smaller screens can decide how you group them and which fieldsets you use. <!-- TODO: confirm with the developer what the responsive views can decide -->
@@ -320,7 +321,7 @@ Finish with a short report:
 - [ ] Breakdown presented as a table and confirmed
 - [ ] General spacing set; exceptions only for clear differences
 - [ ] Header and footer done, loaded with `@include`; everything visible comes from Statamic
-- [ ] New translations added to `nl.json`, sorted A-Z by key
+- [ ] Dutch translations in `nl.json` for every display name, instruction, option label and fieldset title in the touched YAML, checked after the last blueprint change, sorted A-Z by key
 - [ ] Buttons with content from Statamic rendered with `<x-fieldset.button>` (popover triggers and submits: `popovertarget`/`commandfor`/`type` on the fieldset, no wrapper), so the variant is selectable
 - [ ] Interactions match the design (hover, click, what stays open, keyboard), native HTML and CSS first, JavaScript only where needed
 - [ ] Page-dependent states (active menu item and its parent, active filters, selected tabs) taken from the pages where they apply
@@ -332,7 +333,7 @@ Finish with a short report:
 - [ ] No comments in the project's own files; only vendor overrides have their `Overwritten to` line
 - [ ] No variables passed to `@include`; parts used in several places or with different classes are components with `@props` and `twMerge`
 - [ ] Every component built with fieldsets wherever possible, checked on mobile, tablet and desktop, including the foundation elements it uses
-- [ ] Buttons, pills and small lists in the text column are sets in `content`; optional features use a `toggle` with `if` conditions, not a revealer
+- [ ] Buttons, pills and small lists in the text column are sets in `content`; optional features with their own fields are a fieldset with a `show_{feature}` toggle next to the fieldset they extend, not a revealer or a component option
 - [ ] Every interactive state clicked through in the browser at mobile, tablet and desktop, against a production build, on every site
 - [ ] Pages, globals, navigation and forms set up in Statamic as in the design; first title is `page-title` with `h1`
 - [ ] Exactly one `h1` per page, no skipped heading levels

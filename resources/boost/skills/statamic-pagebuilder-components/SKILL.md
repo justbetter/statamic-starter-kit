@@ -226,35 +226,47 @@ title_media:
       import: component_title_media
 ```
 
-3. **Translations**: add Dutch translations for new display names to `nl.json`.
+3. **Translations**: add Dutch translations to `nl.json` for every text Statamic shows editors: display names, instructions, option labels and the fieldset title. Check them again after the last change to the YAML, so renamed or added fields are not missed, and remove keys the YAML no longer uses.
 
 ### Which fields are visible
 
 Editors should only see what they really need:
 - Fields that are filled in or changed for most uses of the component are directly visible.
-- Fields the design rarely uses go into the component options: a toggle with handle `options` (display "Component options") that reveals a group with handle `component_options`.
-- A feature that is off unless the editor turns it on, with its own fields (a video, a location search), gets a `toggle` field (`show_video`) inside the component options, and its fields get `if: show_video: 'equals true'`. The template checks the toggle. Never use a revealer for this: Statamic does not save a revealer's value, so after the first save in the CP the template sees the feature as off.
+- Fields the design rarely uses go into the component options: a toggle with handle `options` (display "Component options") that reveals a group with handle `component_options`. Component options are for layout choices of the component itself, such as a decoration, a theme, a media ratio or a back link.
+- A feature with its own content fields that is off unless the editor turns it on, such as a video on the media, is its own fieldset, not part of the component options. The fieldset is one group named after the feature, with a `show_{feature}` toggle and the other fields behind `if: show_{feature}: 'equals true'`. Import it directly after the fieldset it extends (`video` after `media`), so editors find the settings where they fill in the content, and every component gets the feature by importing one fieldset. Its fieldset component checks the toggle and renders nothing (or only its slot) when it is off, so the template needs no check. Creating a fieldset is a change for the whole project: propose it and ask first (see `statamic-fieldsets`).
+- Never use a revealer for a toggle the template reads: Statamic does not save a revealer's value, so after the first save in the CP the template sees the feature as off. Use a `toggle` with `if` conditions instead.
 
 ```yaml
--
-  handle: show_video
-  field:
-    type: toggle
-    display: Video
--
-  handle: video
-  field:
-    type: video
-    display: 'Video link'
-    if:
-      show_video: 'equals true'
+title: Video
+fields:
+  -
+    handle: video
+    field:
+      type: group
+      display: Video
+      hide_display: true
+      fields:
+        -
+          handle: show_video
+          field:
+            type: toggle
+            display: Video
+        -
+          handle: video
+          field:
+            type: video
+            display: 'Video link'
+            if:
+              show_video: 'equals true'
 ```
 
 ```blade
-$video = ($options->show_video ?? false) ? ($options->video ?? null) : null;
+<x-fieldset.video :video="$video?->value()">
+    <x-fieldset.media :media="$media?->value()" />
+</x-fieldset.video>
 ```
 
-Inside the `component_options` group, toggle and text values arrive as plain values, select values as `LabeledValue` (read them with `?->value()`) and nested groups as `Values`: `($options->decoration ?? null)?->value()`, `$options->show_video ?? false`.
+Inside the `component_options` group, toggle and text values arrive as plain values, select values as `LabeledValue` (read them with `?->value()`) and nested groups as `Values`: `($options->decoration ?? null)?->value()`, `$options->back_link ?? false`.
 
 ## Hard rules
 
@@ -278,7 +290,7 @@ Inside the `component_options` group, toggle and text values arrive as plain val
 - [ ] No margins on the outer element; spacing exceptions added only for clear differences, and reported
 - [ ] Shorthand variables in `@php` at the top
 - [ ] `component_{handle}.yaml` created and set added to the `page_builder` replicator
-- [ ] Rarely used fields in `component_options`
+- [ ] Rarely used layout choices in `component_options`
 - [ ] Buttons, pills and small lists in the text column are sets in `content`, not component fields
-- [ ] Optional features with their own fields use a `toggle` with `if` conditions; no template reads a revealer
-- [ ] Dutch translations added to `nl.json`
+- [ ] Optional features with their own content fields are a fieldset with a `show_{feature}` toggle and `if` conditions, imported after the fieldset they extend (proposed and confirmed first); no template reads a revealer
+- [ ] Dutch translations in `nl.json` for every display name, instruction, option label and fieldset title in the touched YAML, checked after the last blueprint change

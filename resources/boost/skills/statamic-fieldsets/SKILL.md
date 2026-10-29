@@ -7,13 +7,13 @@ description: Use the existing Statamic fieldset components (title, heading, cont
 
 Fieldsets are ready-made Blade components linked to fields in Statamic. They make sure content is always retrieved and rendered the same way, and that every fieldset looks identical on every page. Use them for all manageable content in templates.
 
-The complete list: `accordion`, `button`, `buttons`, `content`, `heading`, `icon`, `link`, `media`, `title`.
+The complete list: `accordion`, `button`, `buttons`, `content`, `heading`, `icon`, `link`, `media`, `title`, `video`.
 
 ## Before you start
 
 1. Fieldset components are in `resources/views/components/fieldset/`. Read the comments at the top of every fieldset you are going to use; they contain its usage instructions and available slots.
 2. Their Statamic configuration is in `resources/fieldsets/{name}.yaml`. Read it for the available fields and options.
-3. If no existing fieldset covers what the design needs, stop and ask, explaining why the existing fieldsets are not sufficient. Never create a fieldset yourself.
+3. If no existing fieldset covers what the design needs, stop and ask, explaining why the existing fieldsets are not sufficient. Never create a fieldset yourself. You may propose one when a feature with its own content fields extends an existing fieldset (as `video` extends `media`) or is needed in several components; create it only after the developer agrees.
 
 ## Naming convention
 
@@ -42,7 +42,7 @@ Every fieldset hides its rarely used settings, so editors only see what they rea
 
 Options are handled entirely inside the fieldset component. You never have to do anything with them in a template; just pass the fieldset variable.
 
-A revealer only shows and hides fields in the CP: Statamic never saves its value, so a template that reads it sees "off" after the first save in the CP. Never read a revealer in a template. When the template must know whether a feature is on (a video, a location search), use a `toggle` field with `if: {toggle}: 'equals true'` on the fields it reveals; it behaves the same in the CP and its value is saved.
+A revealer only shows and hides fields in the CP: Statamic never saves its value, so a template that reads it sees "off" after the first save in the CP. Never read a revealer in a template. When the template must know whether a feature is on (such as `show_video` in the `video` fieldset), use a `toggle` field with `if: {toggle}: 'equals true'` on the fields it reveals; it behaves the same in the CP and its value is saved.
 
 ## Composition
 
@@ -53,6 +53,7 @@ buttons   → button → link → Rapidez tag
              button → Rapidez button variant (primary, secondary, outline)
 title     → heading
 accordion → Rapidez accordion
+video     → wraps media, Rapidez button (close)
 ```
 
 Keep this in mind when something does not match the design. Change it at the lowest level where it belongs: a change to `link` also affects every `button` and `buttons`, a change to `heading` also affects every `title`, and the look of buttons and accordions lives in the Rapidez components. Rapidez components are overridden per project in `resources/views/vendor/rapidez/components/`; see the `rapidez-blade-components` skill.
@@ -189,6 +190,21 @@ For an image or video.
 </div>
 ```
 
+### video
+
+Makes media playable: a play button on top of the media opens a YouTube or Vimeo video in a dialog. The editor turns it on with the `show_video` toggle, which reveals the link, a label on the media and a title for the dialog.
+- Import it directly after `media` in the component's fieldset, so the video settings sit with the media.
+- Wrap it around the media, with the media's shape inside it. Layout classes (width, alignment) go on the `video` call: without a video it renders its slot in a `div` with the same classes.
+- The video only loads while the dialog is open, so it stops playing when the dialog closes.
+
+```blade
+<x-fieldset.video :video="$video?->value()" class="mx-auto max-w-xl">
+    <div class="aspect-square overflow-hidden rounded-blob">
+        <x-fieldset.media :media="$media?->value()" class="size-full" />
+    </div>
+</x-fieldset.video>
+```
+
 ### button
 
 When exactly one button is needed. Built on `link`. If more buttons are needed, use `buttons`.
@@ -290,6 +306,7 @@ Styling of the label and content through slots (only when explicitly requested):
 | Buttons, pills or a short list in the text column, below or between the text | a set in `content` (existing `buttons` set, or propose a new set) |
 | Short plain text where editors must not add headings or buttons | no fieldset: a text field on the component (see `statamic-pagebuilder-components`) |
 | Standalone image or video | `media` |
+| Image with a play button that opens a YouTube or Vimeo video | `video` around `media` |
 | One button with a fixed place outside the text flow (e.g. on a card) | `button` |
 | Multiple buttons with a fixed place outside the text flow | `buttons` |
 | Clickable image or card | `link` around the relevant fieldset(s) |
@@ -299,7 +316,7 @@ Styling of the label and content through slots (only when explicitly requested):
 
 ## Hard rules
 
-1. **Only use existing fieldsets.** Never create a new one; ask instead. New fieldsets affect every project built on the starterkit.
+1. **Only use existing fieldsets.** Never create a new one on your own; ask instead. Propose one when a feature with its own content fields extends an existing fieldset or is needed in several components. New fieldsets affect every project built on the starterkit.
 2. **Never change variables or field names.** They are linked to the fields in the `.yaml` files; a different name means the content no longer loads.
 3. **Never wrap a fieldset in an `@if`.** Every fieldset already contains that check, so an extra one is duplicate logic.
 4. **Statamic configuration always takes precedence.** Do not add classes that counteract a setting editors can change, such as a fixed alignment when alignment is configurable.
