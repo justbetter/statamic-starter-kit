@@ -7,13 +7,13 @@ description: Use the existing Statamic fieldset components (title, heading, cont
 
 Fieldsets are ready-made Blade components linked to fields in Statamic. They make sure content is always retrieved and rendered the same way, and that every fieldset looks identical on every page. Use them for all manageable content in templates.
 
-The complete list: `accordion`, `button`, `buttons`, `content`, `heading`, `icon`, `link`, `media`, `title`.
+The complete list: `accordion`, `button`, `buttons`, `content`, `heading`, `icon`, `link`, `media`, `title`, `video`.
 
 ## Before you start
 
 1. Fieldset components are in `resources/views/components/fieldset/`. Read the comments at the top of every fieldset you are going to use; they contain its usage instructions and available slots.
 2. Their Statamic configuration is in `resources/fieldsets/{name}.yaml`. Read it for the available fields and options.
-3. If no existing fieldset covers what the design needs, stop and ask, explaining why the existing fieldsets are not sufficient. Never create a fieldset yourself.
+3. If no existing fieldset covers what the design needs, stop and ask, explaining why the existing fieldsets are not sufficient. Never create a fieldset yourself. You may propose one when a feature with its own content fields extends an existing fieldset (as `video` extends `media`) or is needed in several components; create it only after the developer agrees.
 
 ## Naming convention
 
@@ -42,6 +42,8 @@ Every fieldset hides its rarely used settings, so editors only see what they rea
 
 Options are handled entirely inside the fieldset component. You never have to do anything with them in a template; just pass the fieldset variable.
 
+A revealer only shows and hides fields in the CP: Statamic never saves its value, so a template that reads it sees "off" after the first save in the CP. Never read a revealer in a template. When the template must know whether a feature is on (such as `show_video` in the `video` fieldset), use a `toggle` field with `if: {toggle}: 'equals true'` on the fields it reveals; it behaves the same in the CP and its value is saved.
+
 ## Composition
 
 Some fieldsets are built on top of other fieldsets or on Rapidez blade components:
@@ -51,6 +53,7 @@ buttons   → button → link → Rapidez tag
              button → Rapidez button variant (primary, secondary, outline)
 title     → heading
 accordion → Rapidez accordion
+video     → wraps media, Rapidez button (close)
 ```
 
 Keep this in mind when something does not match the design. Change it at the lowest level where it belongs: a change to `link` also affects every `button` and `buttons`, a change to `heading` also affects every `title`, and the look of buttons and accordions lives in the Rapidez components. Rapidez components are overridden per project in `resources/views/vendor/rapidez/components/`; see the `rapidez-blade-components` skill.
@@ -61,9 +64,10 @@ Content managed in Statamic always goes through fieldsets. UI elements that do n
 
 On the call `<x-fieldset.* class="...">` only layout and spacing classes are allowed (e.g. `w-1/2`, `mb-6`, `order-2`, `col-span-2`, `size-20`), because the look of a fieldset must be the same everywhere.
 
-Two exceptions:
+Three exceptions:
 - `heading` receives its font size on the call, because it has no fixed size.
 - `icon` may receive a text color on the call, because icons are colored through `currentColor` (unless the editor turned on `preserve_icon_color`).
+- `media` may receive a hover effect on the image (e.g. a zoom) on the call, because it depends on the surrounding card or link (see media).
 
 Not allowed: any other colors, font sizes, font weights, borders or visual styling to make a fieldset match a design. That belongs in the component itself.
 
@@ -77,9 +81,12 @@ Some fieldsets expose named slots (e.g. `label` and `content` on `accordion`). S
 
 Only use a slot when the developer explicitly asks for it.
 
+When a fieldset component passes attributes on to an inner component, pass them unchanged: `:$attributes` for the component's own attributes, `:attributes="$label->attributes"` for a slot's attributes, `{{ $attributes }}` on an element. Only call `twMerge()` when there are default classes to merge (`$attributes->twMerge('flex gap-2')`); an empty `twMerge()` does nothing.
+
 ## Fieldset overview
 
 ### title
+
 Component title. Built on `heading`.
 - Place `<x-fieldset.title />` at most once per template. Editors may still end up with more titles through their own configuration (e.g. a title set inside `content`); that is their choice and fine.
 - Recognizable as a large title introducing a component.
@@ -91,6 +98,7 @@ Component title. Built on `heading`.
 ```
 
 ### heading
+
 A heading where the editor chooses the level (h1 to h6) or strong.
 - May appear multiple times within one component.
 - Is not a component title; use `title` for that.
@@ -100,9 +108,33 @@ A heading where the editor chooses the level (h1 to h6) or strong.
 <x-fieldset.heading :heading="$heading?->value()" class="text-h3" />
 ```
 
+#### Label above a title
+
+A short label above a title (an eyebrow) is a `heading`, never a text field, also when the design marks it as one. The editor chooses `strong` or a heading level that fits the page outline.
+- On the component, reference the fieldset's group with its own display name, so editors recognize it:
+
+```yaml
+-
+  handle: heading
+  field: heading.heading
+  config:
+    display: 'Label above title'
+    hide_display: false
+```
+
+- Render it with a project component `<x-eyebrow>` that wraps `x-fieldset.heading` and holds the label's look from the design, so the look lives in one place:
+
+```blade
+@props(['heading' => null])
+
+<x-fieldset.heading :$heading :attributes="$attributes->twMerge('...')" />
+```
+
 ### content
+
 For larger amounts of text: blog posts, but also most text blocks within components.
 - Prefer combining text, headings and buttons in this single fieldset, instead of separate fields in Statamic for each element.
+- Everything that sits in the text flow, between or after the text, is a Bard set in `content`, never a separate field on the component: buttons, pills (e.g. value items with an icon and a short text), small lists. Editors then decide the order and can leave it out. When no existing set fits, propose a new set (see Supporting a new Bard set inside content) instead of a field on the component. Separate fields are only for elements with a fixed place outside the text flow, such as an eyebrow above the title, or the media.
 - Through the (+) in the Bard editor, editors can add sets: `text`, `buttons` and `title`.
 - Typography comes from prose (see Typography in the guideline).
 - Space between the sets is handled in `spacing.css` through `.fieldset-content + .fieldset-content`. Every set gets the `fieldset-content` class for this; do not add margins between them yourself.
@@ -121,6 +153,7 @@ Available slots: `prose`, `buttons`, `button`, `title` (only when explicitly req
 ```
 
 #### Supporting a new Bard set inside content
+
 To make a new set available through the (+) in the Bard editor, extend the content fieldset component itself (`resources/views/components/fieldset/content.blade.php`), not the place where it is used. This is a global change, so ask first.
 
 Follow the pattern of the existing branches in the `@foreach`:
@@ -140,16 +173,40 @@ Follow the pattern of the existing branches in the `@foreach`:
 The field name (`$data->image`) must match the field in the set's configuration.
 
 ### media
+
 For an image or video.
 - The alt text comes from the asset in Statamic.
 - Options such as object fit, video behavior (autoplay, muted, loop, controls), loading (lazy/eager) and a separate mobile asset are handled inside the fieldset.
 - Autoplaying video respects `prefers-reduced-motion`; this is handled inside the fieldset, not in templates.
+- To style the image or video itself, e.g. a hover zoom, use `**:` as the fieldset does (`**:object-cover`), never `*:`. The direct child is a `<picture>`, which is inline, so `scale` and transforms on it do nothing.
 
 ```blade
 <x-fieldset.media :media="$media?->value()" />
 ```
 
+```blade
+<div class="group">
+    <x-fieldset.media :media="$media?->value()" class="overflow-hidden **:transition **:duration-500 group-hover:**:scale-105" />
+</div>
+```
+
+### video
+
+Makes media playable: a play button on top of the media opens a YouTube or Vimeo video in a dialog. The editor turns it on with the `show_video` toggle, which reveals the link, a label on the media and a title for the dialog.
+- Import it directly after `media` in the component's fieldset, so the video settings sit with the media.
+- Wrap it around the media, with the media's shape inside it. Layout classes (width, alignment) go on the `video` call: without a video it renders its slot in a `div` with the same classes.
+- The video only loads while the dialog is open, so it stops playing when the dialog closes.
+
+```blade
+<x-fieldset.video :video="$video?->value()" class="mx-auto max-w-xl">
+    <div class="aspect-square overflow-hidden rounded-blob">
+        <x-fieldset.media :media="$media?->value()" class="size-full" />
+    </div>
+</x-fieldset.video>
+```
+
 ### button
+
 When exactly one button is needed. Built on `link`. If more buttons are needed, use `buttons`.
 
 ```blade
@@ -158,6 +215,7 @@ When exactly one button is needed. Built on `link`. If more buttons are needed, 
 ```
 
 ### buttons
+
 When the editor must be able to configure multiple buttons. Built on `button`. If only one button is needed, use `button`.
 
 ```blade
@@ -173,6 +231,7 @@ Classes on the individual buttons can be changed through the `button` slot (only
 ```
 
 ### link
+
 Makes another element or fieldset clickable, such as an image or an entire card. It is not a text link: text links belong in `content`.
 - Wrap the link around the fieldset(s) that should become clickable.
 - Without an href, the link renders as a `div`, so the content still shows.
@@ -185,6 +244,7 @@ Makes another element or fieldset clickable, such as an image or an entire card.
 ```
 
 #### No links inside a link
+
 An `<a>` inside an `<a>` is invalid HTML and causes unpredictable browser behavior. This easily happens with a clickable card containing a button, because `button` already contains a `link`.
 
 - When a `button` sits inside a `link` wrapper, give it `:link="false"`. The button then renders as a `<span>` with the same styling.
@@ -199,6 +259,7 @@ An `<a>` inside an `<a>` is invalid HTML and causes unpredictable browser behavi
 ```
 
 ### icon
+
 For an icon. The source from Statamic is always an `.svg`, rendered inline.
 - A size and a text color on the call are allowed (see Which classes are allowed).
 - Icons are decorative by default and hidden from screen readers with `aria-hidden="true"`.
@@ -210,6 +271,7 @@ For an icon. The source from Statamic is always an `.svg`, rendered inline.
 ```
 
 ### accordion
+
 For collapsible elements such as questions and answers. The question/title is always visible; clicking it opens the answer. Built on the Rapidez accordion, which uses `<details>` and `<summary>`.
 
 ```blade
@@ -239,11 +301,14 @@ Styling of the label and content through slots (only when explicitly requested):
 |---|---|
 | Large title at the top of a block | `title` |
 | Subheading, card title | `heading` |
+| Short label above a title (eyebrow) | `heading` with display name "Label above title", rendered with `<x-eyebrow>` |
 | Text, optionally with headings and buttons | `content` |
+| Buttons, pills or a short list in the text column, below or between the text | a set in `content` (existing `buttons` set, or propose a new set) |
 | Short plain text where editors must not add headings or buttons | no fieldset: a text field on the component (see `statamic-pagebuilder-components`) |
 | Standalone image or video | `media` |
-| One standalone button | `button` |
-| Multiple buttons side by side | `buttons` |
+| Image with a play button that opens a YouTube or Vimeo video | `video` around `media` |
+| One button with a fixed place outside the text flow (e.g. on a card) | `button` |
+| Multiple buttons with a fixed place outside the text flow | `buttons` |
 | Clickable image or card | `link` around the relevant fieldset(s) |
 | Text link within body text | `content` |
 | Icon | `icon` |
@@ -251,13 +316,15 @@ Styling of the label and content through slots (only when explicitly requested):
 
 ## Hard rules
 
-1. **Only use existing fieldsets.** Never create a new one; ask instead. New fieldsets affect every project built on the starterkit.
+1. **Only use existing fieldsets.** Never create a new one on your own; ask instead. Propose one when a feature with its own content fields extends an existing fieldset or is needed in several components. New fieldsets affect every project built on the starterkit.
 2. **Never change variables or field names.** They are linked to the fields in the `.yaml` files; a different name means the content no longer loads.
 3. **Never wrap a fieldset in an `@if`.** Every fieldset already contains that check, so an extra one is duplicate logic.
 4. **Statamic configuration always takes precedence.** Do not add classes that counteract a setting editors can change, such as a fixed alignment when alignment is configurable.
 5. **Fix the look at the lowest level, never locally.** If a fieldset does not match the design, change the component it is built on (fieldset or Rapidez component), so it looks identical in every template.
 6. **No slots unless explicitly requested.** Slots are a developer tool, not a way to match a design.
 7. **No nested links.** Invalid HTML breaks behavior and accessibility.
+8. **Text flow goes into `content`.** Buttons, pills and small lists in the text column are Bard sets, not separate fields on the component.
+9. **Never read a revealer in a template.** Its value is not saved; use a `toggle` with `if` conditions for features the template must know about.
 
 ## Checklist before delivery
 
@@ -266,8 +333,11 @@ Styling of the label and content through slots (only when explicitly requested):
 - [ ] No `@if` around a single fieldset
 - [ ] At most one `<x-fieldset.title />` per template
 - [ ] Only layout/spacing classes on calls (plus font size on `heading`, color on `icon`)
+- [ ] A label above a title is the `heading` fieldset ("Label above title") rendered with `<x-eyebrow>`, not a text field
 - [ ] Design deviations solved in the component at the lowest level, not locally
 - [ ] No slots used, unless explicitly requested
 - [ ] No nested links: buttons inside a `link` have `:link="false"`, no `content` inside a `link`
+- [ ] Buttons, pills and small lists in the text column are sets in `content`, not separate component fields
+- [ ] No template reads a revealer; features the template checks use a `toggle` with `if` conditions
 - [ ] Accordions that allow one open item have a `name` unique to the component
 - [ ] Links without visible text: developer reminded to fill in the aria-label in Statamic
