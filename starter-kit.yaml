@@ -43,6 +43,7 @@ export_paths:
   - vite.config.js
   - lang/nl.json
 dependencies:
+  bobwez98/mail-log-statamic: ^1.1
   justbetter/statamic-cloudflare-purge: ^2.0
   justbetter/statamic-detour: ^0.5
   justbetter/statamic-glide-directive: ^4.0
