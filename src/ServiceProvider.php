@@ -8,6 +8,7 @@ use Statamic\Facades\Icon;
 use Statamic\Http\Controllers\CP\Forms\FormsController;
 use Statamic\Http\Middleware\RedirectAbsoluteDomains;
 use Statamic\Providers\AddonServiceProvider;
+use Statamic\Statamic;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -22,6 +23,12 @@ class ServiceProvider extends AddonServiceProvider
     public function bootAddon(): void
     {
         $this->loadTranslationsFrom(__DIR__.'/../lang', 'justbetter-starter-kit');
+
+        Statamic::provideToScript([
+            'justbetterStarterKit' => [
+                'convertToGlobalComponent' => config('statamic-starter-kit.convert_to_global_component'),
+            ],
+        ]);
 
         $this->app->booted(function () {
             $router = app(Router::class);
