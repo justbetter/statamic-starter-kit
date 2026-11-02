@@ -19,7 +19,7 @@ Header and footer are not pagebuilder components.
    - it is unclear which component type the design shows;
    - it is unclear which fieldsets a part of the design needs;
    - the design needs something no existing fieldset covers;
-   - the design contains a slider (there is no slider fieldset; the solution is project-specific).
+   - it is unclear whether a part of the design is a slider, or how it behaves (autoplay, loop); how a slider is built is fixed (see Sliders).
 
 While working, briefly state which files and skills you read and why. If you notice you are missing context halfway through, read the relevant files again before continuing.
 
@@ -142,6 +142,19 @@ field:
     </div>
 @endif
 ```
+
+### Sliders
+
+A row of items that scrolls horizontally (cards, media, logos) is a slider. There is no slider fieldset: the items are repeating items or entries, and the slider is only how they are laid out.
+
+In Statamic-only projects (Alpine), sliders use [Embla](https://www.embla-carousel.com/) (`embla-carousel`, the vanilla core), never a custom scroll-snap script or another library, even when the design's prototype uses one. Rapidez projects (Vue) follow Rapidez's own slider setup instead.
+
+- One Alpine component for every slider, `resources/js/components/carousel.js`, registered as `Alpine.data('carousel', …)`. Reuse it; add an option to it instead of writing a second slider. It creates Embla on `$refs.viewport` (`align: 'start'`, `containScroll: 'trimSnaps'`), exposes `canPrevious`, `canNext` and `overflows` (updated on `init`, `select` and `reInit`) and the methods `previous()` and `next()`, and destroys Embla in `destroy()`. Keep the Embla instance outside Alpine's reactive data (a variable in the factory's closure), because Alpine's proxy breaks it.
+- Markup: `x-data="carousel"` on the component, then a viewport with `x-ref="viewport"` and `overflow-hidden`, then a flex container with `touch-pan-y touch-pinch-zoom`, then the slides with their width per breakpoint (`*:w-[85%] *:shrink-0 md:*:w-[calc((100%-1.5rem)/2)]`). Without `touch-pan-y` the browser takes over horizontal swipes and dragging silently does nothing on touch screens.
+- Room for hover effects: the viewport clips its content, so give it vertical padding when slides lift or cast a shadow on hover (`pt-2 pb-6`). For a next slide that peeks in on mobile, let the viewport run to the screen edge (`-mx-6 px-6 md:mx-0 md:px-0`, matching the container padding).
+- Arrows: `<x-rapidez::button.slider>` with an `aria-label`, bound to `previous`/`next` and disabled with `x-bind:disabled="!canPrevious"` / `"!canNext"`. Show them only when there is something to scroll (`x-show="overflows"`, with `x-cloak`); on touch screens swiping is enough when the design hides them.
+- Reduced motion: scroll without animation when `prefers-reduced-motion: reduce` is set (`embla.scrollNext(true)`); autoplay is never used then.
+- Test swiping in the browser at mobile width. A headless browser does not pass CDP touch input to Embla; dispatch `TouchEvent`s from the page instead.
 
 ### Variables in the template
 
@@ -278,6 +291,7 @@ Inside the `component_options` group, toggle and text values arrive as plain val
 6. **No margins on the outer element.** `spacing.css` handles space between components.
 7. **Configuration included.** A component without its Statamic configuration cannot be used by editors.
 8. **Ask when information is missing.** A wrong guess costs more than a question.
+9. **Sliders use Embla** through the shared `carousel` Alpine component (Statamic-only projects). No custom slider scripts.
 
 ## Checklist before delivery
 
@@ -287,6 +301,7 @@ Inside the `component_options` group, toggle and text values arrive as plain val
 - [ ] All content through `<x-fieldset.*>`
 - [ ] Repeating items in a `replicator` named `{name}_items`; item fields passed without `?->value()`
 - [ ] Every wrapper has an empty-content check
+- [ ] Sliders use the `carousel` Alpine component with Embla (`touch-pan-y touch-pinch-zoom` on the container, `button.slider` arrows with `aria-label`, reduced motion handled), checked by swiping at mobile width
 - [ ] No margins on the outer element; spacing exceptions added only for clear differences, and reported
 - [ ] Shorthand variables in `@php` at the top
 - [ ] `component_{handle}.yaml` created and set added to the `page_builder` replicator
