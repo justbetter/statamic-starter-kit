@@ -226,7 +226,7 @@ title_media:
       import: component_title_media
 ```
 
-3. **Translations**: add Dutch translations to `nl.json` for every text Statamic shows editors: display names, instructions, option labels and the fieldset title. Check them again after the last change to the YAML, so renamed or added fields are not missed, and remove keys the YAML no longer uses.
+3. **Dutch labels**: write every text Statamic shows editors directly in Dutch in the YAML: display names, instructions, option labels and the fieldset title. No translations in `nl.json` for them.
 
 ### Which fields are visible
 
@@ -293,4 +293,4 @@ Inside the `component_options` group, toggle and text values arrive as plain val
 - [ ] Rarely used layout choices in `component_options`
 - [ ] Buttons, pills and small lists in the text column are sets in `content`, not component fields
 - [ ] Optional features with their own content fields are a fieldset with a `show_{feature}` toggle and `if` conditions, imported after the fieldset they extend (proposed and confirmed first); no template reads a revealer
-- [ ] Dutch translations in `nl.json` for every display name, instruction, option label and fieldset title in the touched YAML, checked after the last blueprint change
+- [ ] Display names, instructions, option labels and fieldset titles in the touched YAML written in Dutch, without `nl.json` translations
