@@ -107,6 +107,8 @@ All text from the CMS is rendered with the project's own `<x-prose>` (not `x-rap
 
 A project uses either Vue or Alpine, never both. Check `package.json` (`vue` or `alpinejs`); if unclear, check the templates for `x-data` (Alpine) or Vue components. A project with `rapidez/core` uses Vue. Only use the one the project uses.
 
+Use pnpm for JavaScript dependencies and scripts (`pnpm add`, `pnpm install`, `pnpm build`). Never add a `package-lock.json` or `yarn.lock`.
+
 ## Accessibility
 
 The target is WCAG 2.1 AA, required by accessibility regulations.
