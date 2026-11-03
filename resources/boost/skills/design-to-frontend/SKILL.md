@@ -192,6 +192,8 @@ After the page types are confirmed, present the breakdown of the pages into part
 | Header | fixed | `layouts.header` | existing | brand, header global, navigation | |
 | Hero | component | `banner` | existing | title, content, media, buttons | fullscreen |
 
+When a new component needs a new package or external service, a new JavaScript component, a new PHP class or endpoint, or data from outside its own fields (including a new collection or taxonomy), add those choices to the breakdown as described in Technical proposal in `statamic-pagebuilder-components`. Defaults such as Google Maps for maps are stated as the proposal, never swapped on your own.
+
 ## Step 3: Spacing
 
 Set the general spacing in `spacing.css` as soon as the breakdown is clear: `.component + .component`, `.layout + .layout` and the combinations, and the first and last component of a page. Add exceptions later, while building each component (see `statamic-pagebuilder-components`).

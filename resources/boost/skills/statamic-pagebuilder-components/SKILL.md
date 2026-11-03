@@ -23,6 +23,45 @@ Header and footer are not pagebuilder components.
 
 While working, briefly state which files and skills you read and why. If you notice you are missing context halfway through, read the relevant files again before continuing.
 
+## Technical proposal
+
+Some choices decide how a component works under the hood. They are expensive to undo and easy to miss in a review. Propose them before you build and wait for the developer to confirm. Do this when the component needs:
+
+- a new npm or Composer package, or an external service (maps, video, reviews, search, embeds);
+- a new JavaScript component (Alpine or Vue), instead of reusing an existing one;
+- a new PHP class or endpoint: a Tag, Action, controller, route or API endpoint;
+- data that does not come from the component's own fields: a collection, taxonomy, global or external API.
+
+Present the choices as a table, one row per choice:
+
+| Choice | Proposal | Default or new | Why | Alternatives |
+|---|---|---|---|---|
+| Map | Google Maps in an Alpine `map` component with `@googlemaps/js-api-loader` | default | the design shows an interactive map with several pins | static map image |
+| Data | new `stores` collection | new | the same stores also appear on their own pages | replicator on the component |
+
+When a default exists (Maps below, Sliders, Logic), put it in the proposal as the choice; do not ask an open question about it. Never choose a different library or service than the default without the developer's explicit agreement, even when the design's prototype uses one.
+
+When you work from `design-to-frontend`, these choices are part of the breakdown proposal, not a separate round.
+
+### Collections and taxonomies
+
+Never create a collection or taxonomy on your own. Use an existing one when it fits. Otherwise include in the proposal:
+
+- **Whether it should be one at all**: a collection or taxonomy, or a replicator on the component (`{name}_items`), a global or a select field. A collection fits when the same items appear in several places, get their own page, or are filtered by category (a taxonomy).
+- **Name and handle**: an English snake_case handle and a Dutch display name.
+- **Blueprint fields**: the fields of an entry or term, with the fieldsets they import.
+- **Routes and pages**: whether entries get their own detail page (route and template) and an overview page, or are only shown inside components.
+
+The `faq` collection shows the pattern for items shown in a component: the content lives in the collection, with a taxonomy for categories. The component selects items manually or by category, through a Tag (see Fetching data).
+
+### Maps
+
+Maps use Google Maps. Never use OpenStreetMap, Leaflet, Mapbox or another provider without the developer's explicit agreement.
+
+- **Statamic-only projects (Alpine)**: an Alpine component that follows the Logic rules (`asyncData` + `x-load`, options passed with `@js()`) and loads Google Maps with `@googlemaps/js-api-loader`. Add `@googlemaps/markerclusterer` only when there are many markers. For one fixed location without interaction, use a Static Maps image (`https://maps.googleapis.com/maps/api/staticmap?...`) and no JavaScript. The key is `config('services.google_maps_api_key')`, from `MAPS_KEY` in `.env`; pass it to the component as an option.
+- **Rapidez projects (Vue)**: `vue3-google-map` (`<google-map>`, `<google-marker>`) inside a renderless Vue component that holds the logic (see Logic). The key reaches the frontend through `config(['frontend.maps' => ['key' => ...]])` and is used as `config.maps.key`.
+- **Reference implementations**, when available: fietsenwinkel-rapidez (`page_builder/location_maps`, `resources/js/components/Gmap.vue`) and BerendBotje (`resources/js/components/maps.js`, `resources/js/utils/maps/`). BerendBotje registers its component with `Alpine.data` and positional arguments; follow the Logic rules instead.
+
 ## Naming
 
 A component has one name, used in three forms:
@@ -381,9 +420,11 @@ Inside the `component_options` group, toggle and text values arrive as plain val
 8. **Ask when information is missing.** A wrong guess costs more than a question.
 9. **Sliders use Embla** through the shared `carousel` Alpine component (Statamic-only projects). No custom slider scripts.
 10. **Logic outside the markup.** Fetched data comes from Tag methods called in the top `@php` block. Behavior lives in Alpine components (`asyncData` + `x-load`, bound from Blade) or in renderless Vue components (Rapidez).
+11. **Propose technical choices first.** New packages, external services, JavaScript components, PHP classes or endpoints, and data from outside the component's fields (including new collections and taxonomies) are proposed and confirmed before you build. Defaults such as Google Maps and Embla are never swapped without agreement.
 
 ## Checklist before delivery
 
+- [ ] Technical choices (packages, external services, new JS components, new PHP classes or endpoints, data from outside the component's fields, new collections or taxonomies) proposed and confirmed before building; maps use Google Maps
 - [ ] Handle, file name and type class match (`title_media` / `title_media.blade.php` / `title-media`), English, shape-based
 - [ ] Outer element has `component` + type class; modifiers only via `@class` from Statamic options
 - [ ] Container used, unless a Statamic option says otherwise
