@@ -284,7 +284,7 @@ and put `x-load` on every element that uses the component: `<div x-data="opening
 
 **Passing data.**
 - Pass config, URLs and data (arrays, collections) as factory arguments with `@js()`: `x-data="openingTimes(@js($endpoint))"`. Do not use `data-*` attributes or `json_encode`.
-- Translations stay in Blade: render the text with `__()` in the markup and let the component toggle what is shown. Do not pass translations into the component.
+- Translations stay in Blade: render the text with `@lang()` in the markup and let the component toggle what is shown. Do not pass translations into the component.
 
 **Sharing and communication.**
 - To extend a component, spread its factory: `({ ...formSubmit(), submitWizard() { ... } })`.

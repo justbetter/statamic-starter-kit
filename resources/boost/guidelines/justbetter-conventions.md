@@ -61,6 +61,7 @@ $entries = $query
 - **Values that may not exist are read with `??`**: `?? false` in conditions, `?? null` in output and props. `?->value()` only protects against an empty field, not against a variable or key that is missing: a global that is not enabled for the current site (`$brand`, `$header`), an optional key in a fieldset group or replicator item (`$button['button_text']`), or a cascade variable that only exists on some pages (`$id`). For example `@if ($brand->logo ?? false)`, `{{ $header->search_placeholder ?? null }}`, `:button="$header->button ?? null"`. A missing value then leaves that part out instead of breaking the whole page with "Undefined variable".
 - **Handles, classes and code in English.** Texts Statamic shows editors (display names, instructions, option labels, fieldset titles) are written directly in Dutch in the project's YAML, without translations in `nl.json`.
 - **PHP variables** follow Laravel conventions: short and descriptive.
+- **Translations in Blade use `@lang()`** wherever the text is output directly: in markup and in plain HTML attributes (`<span>@lang('All locations')</span>`, `aria-label="@lang('Close')"`), not `{{ __('All locations') }}`. Use `__()` only where a PHP expression is needed: component props (`:aria-label="__('Next')"`), `@php` blocks and other PHP code. `@lang()` does not escape its output, so a translation with a placeholder filled from CMS or user data also uses `{{ __('...', [...]) }}`.
 
 ## Components
 
