@@ -256,6 +256,7 @@ When a component shows data that is not in its own fields (FAQ entries, products
 ```
 
 - Write one method per concern. When a component needs several kinds of data (products, step labels, URLs), give the Tag a method for each. Never write one method that returns a large array the template has to unpack into many variables.
+- Query Statamic data as described in Querying Statamic data in the JustBetter conventions. Put the query builder in its own typed variable (`/** @var EntryQueryBuilder $query */ $query = EntryFacade::query();`). Write every condition with `->where()` and an explicit operator, including `site`. Never use shortcut methods such as `whereCollection()`, except `->whereStatus('published')` for the status.
 - Keep the Tag thin. Heavy logic (matching, scoring, combining sources) goes into an Action in `app/Actions/` that the Tag method calls.
 
 ### Sub-parts
