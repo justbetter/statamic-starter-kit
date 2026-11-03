@@ -149,8 +149,8 @@ A row of items that scrolls horizontally (cards, media, logos) is a slider. Ther
 
 In Statamic-only projects (Alpine), sliders use [Embla](https://www.embla-carousel.com/) (`embla-carousel`, the vanilla core), never a custom scroll-snap script or another library, even when the design's prototype uses one. Rapidez projects (Vue) follow Rapidez's own slider setup instead.
 
-- One Alpine component for every slider, `resources/js/components/carousel.js`, registered as `Alpine.data('carousel', …)`. Reuse it; add an option to it instead of writing a second slider. It creates Embla on `$refs.viewport` (`align: 'start'`, `containScroll: 'trimSnaps'`), exposes `canPrevious`, `canNext` and `overflows` (updated on `init`, `select` and `reInit`) and the methods `previous()` and `next()`, and destroys Embla in `destroy()`. Keep the Embla instance outside Alpine's reactive data (a variable in the factory's closure), because Alpine's proxy breaks it.
-- Markup: `x-data="carousel"` on the component, then a viewport with `x-ref="viewport"` and `overflow-hidden`, then a flex container with `-mx-3 touch-pan-y touch-pinch-zoom`, then a wrapper per slide with `min-w-0 shrink-0 px-3` and a plain fraction per breakpoint (`basis-10/12 md:basis-1/2 lg:basis-1/3`). The space between slides is horizontal padding on the wrappers (half the gap on each side) with the same negative margin on the container, not `gap`, so the fractions add up to 100% without `calc()` and the first and last slide line up with the container edges. Without `touch-pan-y` the browser takes over horizontal swipes and dragging silently does nothing on touch screens.
+- One Alpine component for every slider, `resources/js/components/carousel.js`, registered lazily as `Alpine.asyncData('carousel', …)` and used with `x-data="carousel" x-load` (see Logic). Reuse it; add an option to it instead of writing a second slider. It creates Embla on `$refs.viewport` (`align: 'start'`, `containScroll: 'trimSnaps'`), exposes `canPrevious`, `canNext` and `overflows` (updated on `init`, `select` and `reInit`) and the methods `previous()` and `next()`, and destroys Embla in `destroy()`. Keep the Embla instance outside Alpine's reactive data (a variable in the factory's closure), because Alpine's proxy breaks it.
+- Markup: `x-data="carousel" x-load` on the component, then a viewport with `x-ref="viewport"` and `overflow-hidden`, then a flex container with `-mx-3 touch-pan-y touch-pinch-zoom`, then a wrapper per slide with `min-w-0 shrink-0 px-3` and a plain fraction per breakpoint (`basis-10/12 md:basis-1/2 lg:basis-1/3`). The space between slides is horizontal padding on the wrappers (half the gap on each side) with the same negative margin on the container, not `gap`, so the fractions add up to 100% without `calc()` and the first and last slide line up with the container edges. Without `touch-pan-y` the browser takes over horizontal swipes and dragging silently does nothing on touch screens.
 - Room for hover effects: the viewport clips its content, so give it vertical padding when slides lift or cast a shadow on hover (`pt-2 pb-6`). For a next slide that peeks in on mobile, let the viewport run to the screen edge (`-mx-6 px-6 md:mx-0 md:px-0`, matching the container padding).
 - Arrows: `<x-rapidez::button.slider>` with an `aria-label`, bound to `previous`/`next` and disabled with `x-bind:disabled="!canPrevious"` / `"!canNext"`. Show them only when there is something to scroll (`x-show="overflows"`, with `x-cloak`); on touch screens swiping is enough when the design hides them.
 - Reduced motion: scroll without animation when `prefers-reduced-motion: reduce` is set (`embla.scrollNext(true)`); autoplay is never used then.
@@ -160,7 +160,15 @@ In Statamic-only projects (Alpine), sliders use [Embla](https://www.embla-carous
 
 `page_builder.blade.php` includes each component with all fields of its set as variables, including the set's unique `$id`. Each fieldset arrives as one variable with the same name (see the `statamic-fieldsets` skill).
 
-Do not wrap the whole component in an empty-content check. Editors can disable a component in Statamic, and an empty component should be removed by the editor.
+Do not wrap the whole component in an empty-content check because of optional fields such as a title or content. Editors can disable a component in Statamic, and an empty component should be removed by the editor. The exception is a component that is meaningless without its main data: fetched items (FAQ entries, products), its main list of repeating items, or a form. Wrap the whole component in a check on that data only:
+
+```blade
+@if ($faqItems->isNotEmpty())
+    <div class="component faq">
+        ...
+    </div>
+@endif
+```
 
 ## Wrappers around fieldsets
 
@@ -183,9 +191,89 @@ Take the condition from the top of each fieldset file, apply it to the `?->value
 </div>
 ```
 
-## Variables
+## Logic
 
-When you need shorthand variables, define them in a `@php ... @endphp` block at the top of the file, so all logic is in one place and the markup stays readable.
+Keep logic out of the markup. Data comes from PHP, behavior comes from a JavaScript component, and the Blade file connects the two.
+
+### PHP in the template
+
+- Values for the whole component go in one `@php ... @endphp` block at the top of the file: shorthand variables, data from a Tag, and classes chosen from an option.
+- A small value per item in a loop (an id, a URL) may go in a short `@php` block at the start of the loop body. When an item needs more logic than that, make it a Blade component with its own `@php` block (see Sub-parts). Only do that when it makes the template clearer, not by default.
+- Fetch data in the top block, never inside a loop.
+
+### Fetching data
+
+When a component shows data that is not in its own fields (FAQ entries, products, stores), fetch it with a Statamic Tag. Check `app/Tags/` for an existing Tag first (the starter kit ships `Faq`).
+
+- The Tag is `app/Tags/{Name}.php`, extending `Statamic\Tags\Tags`, with typed methods (a return type plus a `@return Collection<int, Entry>` docblock).
+- Pass the component's fields as params. Call the Tag once in the top `@php` block:
+
+```blade
+@php
+    $faqItems = \Statamic\Statamic::tag('faq:getItems')
+        ->params(['type' => $faq_type?->value()?->value(), 'items' => $faq_items?->get(), 'categories' => $faq_categories?->get()])
+        ->fetch();
+@endphp
+```
+
+- Write one method per concern. When a component needs several kinds of data (products, step labels, URLs), give the Tag a method for each. Never write one method that returns a large array the template has to unpack into many variables.
+- Keep the Tag thin. Heavy logic (matching, scoring, combining sources) goes into an Action in `app/Actions/` that the Tag method calls.
+
+### Sub-parts
+
+- Split a large component, or one with alternative layouts (a fullscreen variant, a map with filters), into partials in `resources/views/page_builder/{handle}/{part}.blade.php`. Include them with `@include('page_builder.{handle}.{part}')`. The main file keeps the `@php` block and the outer structure, and includes the parts in order.
+- A part becomes a Blade component in `resources/views/components/` when another component or page reuses it, or when it is a loop item with its own logic (e.g. `<x-tile :$tile />`).
+
+### JavaScript in Statamic-only projects (Alpine)
+
+Use native HTML and CSS first (`<details>`, `popover`, `<dialog>`). Use Alpine only for what they cannot do.
+
+**Inline or file.** Inline `x-data` is only for state toggled from the markup: `x-data="{ open: false }"`. As soon as you need a method, `init()`, a library or a fetch, write a component file `resources/js/components/{name}.js` (camelCase). Check that folder for an existing component first.
+
+**Registering.** Always load components lazily. Register them in `resources/js/site.js`:
+
+```js
+Alpine.asyncData('openingTimes', () => import('./components/openingTimes.js'));
+```
+
+and put `x-load` on every element that uses the component: `<div x-data="openingTimes(...)" x-load>`. Without `x-load` the component never loads.
+
+**Shape.** A component file exports a factory: `export default (options = {}) => ({ ... })`. Keep library instances (Embla, a map) out of Alpine's reactive data, as a variable in the factory's closure, because Alpine's proxy breaks them. Clean them up in `destroy()`.
+
+**Connecting to the markup.** The component exposes state and methods. Blade binds them with `x-on:click="next"`, `x-bind:disabled="!canNext"`, `x-show` and `x-text`. Find elements with `x-ref` / `$refs`, never with class selectors. Only when a library cannot work through bindings may the JavaScript attach listeners or set attributes itself, and it still finds the elements through `$refs`.
+
+**Passing data.**
+- Pass config, URLs and data (arrays, collections) as factory arguments with `@js()`: `x-data="openingTimes(@js($endpoint))"`. Do not use `data-*` attributes or `json_encode`.
+- Translations stay in Blade: render the text with `__()` in the markup and let the component toggle what is shown. Do not pass translations into the component.
+
+**Sharing and communication.**
+- To extend a component, spread its factory: `({ ...formSubmit(), submitWizard() { ... } })`.
+- Put plain helper functions shared by several components in `resources/js/utils/` and import them.
+- State that several components on the page read goes in an `Alpine.store`, registered in `site.js`.
+- Separate components talk through events: `$dispatch('set-sticky-bar', true)` on one side and `x-on:set-sticky-bar.window` on the other. A component never reaches into another component.
+
+### JavaScript in Rapidez projects (Vue)
+
+- Build JavaScript components as renderless Vue components in `resources/js/components/{Name}.vue`. Rapidez registers them by file name in kebab-case; use `.lazy.vue` for lazy loading. The component only holds logic and exposes state and methods as slot props. Markup, classes and translations stay in Blade.
+- Pass props from Blade with `@js()`, not `json_encode`.
+
+```blade
+<hotspot-image v-slot="{ activeHotspot, setActiveHotspot }">
+    <div v-on:mouseenter="setActiveHotspot(@js($hotspot['id']))" ...>
+</hotspot-image>
+```
+
+```js
+export default {
+    data: () => ({ activeHotspot: null }),
+    methods: {
+        setActiveHotspot(id) { this.activeHotspot = id },
+    },
+    render() {
+        return this.$slots.default?.({ activeHotspot: this.activeHotspot, setActiveHotspot: this.setActiveHotspot })
+    },
+}
+```
 
 ## Spacing
 
@@ -292,6 +380,7 @@ Inside the `component_options` group, toggle and text values arrive as plain val
 7. **Configuration included.** A component without its Statamic configuration cannot be used by editors.
 8. **Ask when information is missing.** A wrong guess costs more than a question.
 9. **Sliders use Embla** through the shared `carousel` Alpine component (Statamic-only projects). No custom slider scripts.
+10. **Logic outside the markup.** Fetched data comes from Tag methods called in the top `@php` block. Behavior lives in Alpine components (`asyncData` + `x-load`, bound from Blade) or in renderless Vue components (Rapidez).
 
 ## Checklist before delivery
 
@@ -300,10 +389,14 @@ Inside the `component_options` group, toggle and text values arrive as plain val
 - [ ] Container used, unless a Statamic option says otherwise
 - [ ] All content through `<x-fieldset.*>`
 - [ ] Repeating items in a `replicator` named `{name}_items`; item fields passed without `?->value()`
-- [ ] Every wrapper has an empty-content check
+- [ ] Every wrapper has an empty-content check; the whole component is wrapped only for its main data (fetched items, main list, form)
 - [ ] Sliders use the `carousel` Alpine component with Embla (`touch-pan-y touch-pinch-zoom` on the container, `button.slider` arrows with `aria-label`, reduced motion handled), checked by swiping at mobile width
 - [ ] No margins on the outer element; spacing exceptions added only for clear differences, and reported
-- [ ] Shorthand variables in `@php` at the top
+- [ ] Component-level values and data fetching in the `@php` block at the top; only small per-item values in loops
+- [ ] Fetched data comes from a Tag in `app/Tags/`, with one method per concern; heavy logic in an Action
+- [ ] Partials in `page_builder/{handle}/`; Blade components only for reused parts or loop items with their own logic
+- [ ] Alpine: inline `x-data` only for plain state; component files registered with `Alpine.asyncData` and used with `x-load`; state bound from Blade, elements found with `$refs`; data passed with `@js()`, translations kept in Blade
+- [ ] Vue (Rapidez): renderless components with slot props, props passed with `@js()`
 - [ ] `component_{handle}.yaml` created and set added to the `page_builder` replicator
 - [ ] Rarely used layout choices in `component_options`
 - [ ] Buttons, pills and small lists in the text column are sets in `content`, not component fields
