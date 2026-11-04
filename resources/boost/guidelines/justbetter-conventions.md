@@ -24,6 +24,36 @@ For Rapidez-specific questions, check https://docs.rapidez.io/llms.txt first.
 
 `cboxdk/statamic-mcp` gives you tools to read and change Statamic: blueprints, fieldsets, collections, navigations, globals, entries and assets. Use them to inspect the existing configuration instead of guessing, and to set up content as described in `design-to-frontend`.
 
+## Querying Statamic data
+
+- Put the query builder in its own variable with a `@var` docblock, so PHPStan and the editor know its type. Never chain directly on the facade.
+- Write every condition out in full with `->where()` and an explicit operator. Never use shortcut methods such as `whereCollection()` or `whereTaxonomy()`.
+- The one exception is status: always use `->whereStatus('published')`, never `->where('status', '=', 'published')` or `->where('published', '=', true)`.
+- Queries on entries always filter on `site` and status.
+- Type the result with a `@var` docblock as well.
+
+```php
+use Illuminate\Support\Collection;
+use Statamic\Eloquent\Entries\Entry;
+use Statamic\Eloquent\Entries\EntryQueryBuilder;
+use Statamic\Facades\Entry as EntryFacade;
+use Statamic\Facades\Site as SiteFacade;
+use Statamic\Sites\Site;
+
+/** @var Site $site */
+$site = SiteFacade::current();
+
+/** @var EntryQueryBuilder $query */
+$query = EntryFacade::query();
+
+/** @var Collection<int, Entry> $entries */
+$entries = $query
+    ->where('collection', '=', 'locations')
+    ->where('site', '=', $site->handle())
+    ->whereStatus('published')
+    ->get();
+```
+
 ## Templates
 
 - **Always Blade, never Antlers.** All components, fieldsets and pagebuilder components are Blade, so Antlers would not work with them. This also applies when other Statamic guidelines show Antlers examples.
@@ -31,6 +61,7 @@ For Rapidez-specific questions, check https://docs.rapidez.io/llms.txt first.
 - **Values that may not exist are read with `??`**: `?? false` in conditions, `?? null` in output and props. `?->value()` only protects against an empty field, not against a variable or key that is missing: a global that is not enabled for the current site (`$brand`, `$header`), an optional key in a fieldset group or replicator item (`$button['button_text']`), or a cascade variable that only exists on some pages (`$id`). For example `@if ($brand->logo ?? false)`, `{{ $header->search_placeholder ?? null }}`, `:button="$header->button ?? null"`. A missing value then leaves that part out instead of breaking the whole page with "Undefined variable".
 - **Handles, classes and code in English.** Texts Statamic shows editors (display names, instructions, option labels, fieldset titles) are written directly in Dutch in the project's YAML, without translations in `nl.json`.
 - **PHP variables** follow Laravel conventions: short and descriptive.
+- **Translations in Blade use `@lang()`** wherever the text is output directly: in markup and in plain HTML attributes (`<span>@lang('All locations')</span>`, `aria-label="@lang('Close')"`), not `{{ __('All locations') }}`. Use `__()` only where a PHP expression is needed: component props (`:aria-label="__('Next')"`), `@php` blocks and other PHP code. `@lang()` does not escape its output, so a translation with a placeholder filled from CMS or user data also uses `{{ __('...', [...]) }}`.
 
 ## Components
 

@@ -256,6 +256,7 @@ When a component shows data that is not in its own fields (FAQ entries, products
 ```
 
 - Write one method per concern. When a component needs several kinds of data (products, step labels, URLs), give the Tag a method for each. Never write one method that returns a large array the template has to unpack into many variables.
+- Query Statamic data as described in Querying Statamic data in the JustBetter conventions. Put the query builder in its own typed variable (`/** @var EntryQueryBuilder $query */ $query = EntryFacade::query();`). Write every condition with `->where()` and an explicit operator, including `site`. Never use shortcut methods such as `whereCollection()`, except `->whereStatus('published')` for the status.
 - Keep the Tag thin. Heavy logic (matching, scoring, combining sources) goes into an Action in `app/Actions/` that the Tag method calls.
 
 ### Sub-parts
@@ -283,7 +284,7 @@ and put `x-load` on every element that uses the component: `<div x-data="opening
 
 **Passing data.**
 - Pass config, URLs and data (arrays, collections) as factory arguments with `@js()`: `x-data="openingTimes(@js($endpoint))"`. Do not use `data-*` attributes or `json_encode`.
-- Translations stay in Blade: render the text with `__()` in the markup and let the component toggle what is shown. Do not pass translations into the component.
+- Translations stay in Blade: render the text with `@lang()` in the markup and let the component toggle what is shown. Do not pass translations into the component.
 
 **Sharing and communication.**
 - To extend a component, spread its factory: `({ ...formSubmit(), submitWizard() { ... } })`.
