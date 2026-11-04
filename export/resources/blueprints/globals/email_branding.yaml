@@ -14,15 +14,15 @@ tabs:
               display: Logo
               localizable: false
       -
-        display: Ontvangers
+        display: Recipients
         fields:
           -
             handle: notification_email
             field:
               type: text
               input_type: email
-              display: 'E-mailadres voor meldingen'
-              instructions: 'Hier komen de meldingen van formulieren op deze site binnen.'
+              display: 'Notification email address'
+              instructions: 'Form notifications from this site are sent to this address.'
               localizable: true
               validate:
                 - email
@@ -96,7 +96,7 @@ tabs:
                 - small
               remove_empty_nodes: false
               type: bard
-              display: 'Linkerkant - Tekst'
+              display: 'Left side - Text'
               localizable: true
           -
             handle: footer_right_text
@@ -113,5 +113,5 @@ tabs:
                 - small
               remove_empty_nodes: false
               type: bard
-              display: 'Rechterkant - Tekst'
+              display: 'Right side - Text'
               localizable: true
