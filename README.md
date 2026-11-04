@@ -18,3 +18,11 @@ $this->call('statamic:starter-kit:install', [
 ]);
 ```
 
+## Deploying
+
+Pagebuilder set preview images live in `public/previews` and are committed to git. With the Eloquent asset driver, Statamic only shows an image that has a database row. Add this to every environment's deploy script:
+
+```bash
+php please eloquent:sync-assets --container=previews
+```
+
