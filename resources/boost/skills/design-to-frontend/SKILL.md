@@ -244,7 +244,7 @@ How to split:
 Zoom in on one component and decide, per visible element, where it comes from:
 - a fieldset (see the decision guide in `statamic-fieldsets`). Use fieldsets wherever possible, because they keep everything consistent;
 - a set in the `content` fieldset, for everything in the text flow below or between the text: buttons, pills, small lists. Not a separate field on the component, even when the design annotates it as one (e.g. `{{ $buttons }}` or a `value_items` replicator next to the content);
-- a plain text field on the component, only when a fieldset is more than needed (e.g. a short text without headings or buttons). Not a label above a title (eyebrow), even when the design marks it as a text field: that is the `heading` fieldset with `<x-eyebrow>` (see `statamic-fieldsets`);
+- a plain text field on the component, only when a fieldset is more than needed (e.g. a short text without headings or buttons). A label above a title (eyebrow) is always such a text field, with the handle `eyebrow`, rendered with `<x-eyebrow>` (see `statamic-fieldsets`);
 - repeating items (cards, tiles, usps), for a list of the same kind of element (see Repeating items in `statamic-pagebuilder-components`);
 - a component option, for a layout choice the editor makes (decoration, theme, ratio);
 - a fieldset with a `show_{feature}` toggle, for a feature with its own content fields that is only sometimes used, such as a video on the media. It is imported right after the fieldset it extends, never placed in the component options, and never behind a revealer (see Which fields are visible in `statamic-pagebuilder-components`);

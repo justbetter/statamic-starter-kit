@@ -110,24 +110,29 @@ A heading where the editor chooses the level (h1 to h6) or strong.
 
 #### Label above a title
 
-A short label above a title (an eyebrow) is a `heading`, never a text field, also when the design marks it as one. The editor chooses `strong` or a heading level that fits the page outline.
-- On the component, reference the fieldset's group with its own display name, so editors recognize it:
+A short label above a title (an eyebrow) is not a `heading`: editors must not choose a heading level for it. It is a plain text field `eyebrow` on the component:
 
 ```yaml
 -
-  handle: heading
-  field: heading.heading
-  config:
+  handle: eyebrow
+  field:
+    type: text
     display: 'Label above title'
-    hide_display: false
+    localizable: false
 ```
 
-- Render it with a project component `<x-eyebrow>` that wraps `x-fieldset.heading` and holds the label's look from the design, so the look lives in one place:
+- Render it with a project component `<x-eyebrow>` that holds the label's look from the design, so the look lives in one place. It outputs nothing when the text is empty:
 
 ```blade
-@props(['heading' => null])
+@props(['text' => null])
 
-<x-fieldset.heading :$heading :attributes="$attributes->twMerge('...')" />
+@if ($text)
+    <p {{ $attributes->twMerge('...') }}>{{ $text }}</p>
+@endif
+```
+
+```blade
+<x-eyebrow :text="$eyebrow?->value()" />
 ```
 
 ### content
@@ -323,7 +328,7 @@ Styling of the label and content through slots (only when explicitly requested):
 |---|---|
 | Large title at the top of a block | `title` |
 | Subheading, card title | `heading` |
-| Short label above a title (eyebrow) | `heading` with display name "Label above title", rendered with `<x-eyebrow>` |
+| Short label above a title (eyebrow) | no fieldset: an `eyebrow` text field ("Label above title"), rendered with `<x-eyebrow>` |
 | Text, optionally with headings and buttons | `content` |
 | Buttons, pills or a short list in the text column, below or between the text | a set in `content` (existing `buttons` set, or propose a new set) |
 | Short plain text where editors must not add headings or buttons | no fieldset: a text field on the component (see `statamic-pagebuilder-components`) |
@@ -355,7 +360,7 @@ Styling of the label and content through slots (only when explicitly requested):
 - [ ] No `@if` around a single fieldset
 - [ ] At most one `<x-fieldset.title />` per template
 - [ ] Only layout/spacing classes on calls (plus font size on `heading`, color on `icon`)
-- [ ] A label above a title is the `heading` fieldset ("Label above title") rendered with `<x-eyebrow>`, not a text field
+- [ ] A label above a title is an `eyebrow` text field ("Label above title") rendered with `<x-eyebrow>`, not the `heading` fieldset
 - [ ] Design deviations solved in the component at the lowest level, not locally
 - [ ] No slots used, unless explicitly requested
 - [ ] No nested links: buttons inside a `link` have `:link="false"`, no `content` inside a `link`

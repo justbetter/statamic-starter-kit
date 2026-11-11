@@ -132,7 +132,7 @@ Use the `content` fieldset for text, unless editors must not be able to add head
 <x-prose>{{ $description?->value() }}</x-prose>
 ```
 
-A short label above the title (eyebrow) is not a text field but the `heading` fieldset, rendered with `<x-eyebrow>` (see Label above a title in `statamic-fieldsets`).
+A short label above the title (eyebrow) is also a plain text field, with the handle `eyebrow`, rendered with `<x-eyebrow>` instead of `<x-prose>` (see Label above a title in `statamic-fieldsets`).
 
 Buttons, pills and small lists that sit in the text column, below or between the text, are sets in the `content` fieldset, not fields on the component (see `content` in `statamic-fieldsets`). Do not add a `buttons` import or a replicator for them to the component.
 
