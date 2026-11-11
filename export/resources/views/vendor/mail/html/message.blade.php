@@ -64,6 +64,13 @@
 </style>
 </x-slot>
 
+{{-- Header --}}
+<x-slot:header>
+<x-mail::header :url="$siteUrl ?? config('app.url')">
+{{ config('app.name') }}
+</x-mail::header>
+</x-slot:header>
+
 <div class="body-container">
 {{-- Body --}}
 {{ $slot }}
@@ -79,11 +86,9 @@
 </div>
 
 {{-- Footer --}}
-@if ($footer ?? false)
 <x-slot:footer>
 <x-mail::footer>
-    {{ $footer }}
+{{ $footer ?? '' }}
 </x-mail::footer>
 </x-slot>
-@endif
 </x-mail::layout>
