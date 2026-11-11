@@ -1,0 +1,60 @@
+title: 'Button variant'
+fields:
+  -
+    handle: button_variant
+    field:
+      options:
+        -
+          key: primary
+          value: 'Primary (Color)'
+        -
+          key: secondary
+          value: 'Secondary (Color)'
+        -
+          key: outline
+          value: 'Outlined (Outline)'
+      default: primary
+      type: select
+      display: 'Button variant'
+      localizable: false
+  -
+    handle: button_text
+    field:
+      type: text
+      display: 'Button text'
+      width: 66
+      localizable: false
+  -
+    handle: options
+    field:
+      type: revealer
+      display: 'Button options'
+      localizable: false
+      width: 33
+      mode: toggle
+  -
+    handle: button_options
+    field:
+      type: group
+      display: 'Button options'
+      localizable: false
+      if:
+        options: 'equals true'
+      fields:
+        -
+          import: icon
+        -
+          handle: icon_position
+          field:
+            options:
+              -
+                key: left
+                value: Left
+              -
+                key: right
+                value: Right
+            default: right
+            type: select
+            display: 'Icon position'
+            localizable: false
+            width: 50

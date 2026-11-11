@@ -239,6 +239,8 @@ Keep logic out of the markup. Data comes from PHP, behavior comes from a JavaScr
 - Values for the whole component go in one `@php ... @endphp` block at the top of the file: shorthand variables, data from a Tag, and classes chosen from an option.
 - A small value per item in a loop (an id, a URL) may go in a short `@php` block at the start of the loop body. When an item needs more logic than that, make it a Blade component with its own `@php` block (see Sub-parts). Only do that when it makes the template clearer, not by default.
 - Fetch data in the top block, never inside a loop.
+- Conditional classes use `@class([...])`, also on a component tag (`<x-form @class(['lg:col-span-3' => $hasIntro]) />`), never `:class="Arr::toCssClasses([...])"`.
+- Pass a variable to a prop or attribute with the same name with the shorthand: `:$value`, `:$button`, not `value="{{ $value }}"`.
 
 ### Fetching data
 

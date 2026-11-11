@@ -1,6 +1,7 @@
 {{--
 This is a single button.
 If you need more buttons use the (plural) fieldset.buttons.
+For a button without a link, such as a form submit, use fieldset.button-variant.
 
 Example:
 ```
@@ -14,27 +15,7 @@ Example:
 @props(['button' => false, 'link' => true])
 
 @if ($button && ($button['button_text'] ?? false) && ($button->link['link'] ?? false))
-    @php
-        $variant = match($button['button_variant']->value()) {
-            default => 'rapidez::button.primary',
-            'primary' => 'rapidez::button.primary',
-            'secondary' => 'rapidez::button.secondary',
-            'outline' => 'rapidez::button.outline'
-        };
-    @endphp
-
     <x-fieldset.link :link="$button['link']" :disable="!$link" :attributes="$attributes->twMerge('inline-block')">
-        <x-dynamic-component
-            :component="$variant"
-            class="size-full"
-            tag="span"
-        >
-            <x-fieldset.icon
-                :icon="$button->button_options['icon']"
-                @class(['h-6', $button->button_options['icon_position']?->value() === 'right' ? 'order-last' : null])
-            />
-
-            {{ $button['button_text'] }}
-        </x-dynamic-component>
+        <x-fieldset.button-variant :$button class="size-full" tag="span" />
     </x-fieldset.link>
 @endif

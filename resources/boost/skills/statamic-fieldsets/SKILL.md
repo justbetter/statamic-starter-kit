@@ -7,7 +7,7 @@ description: Use the existing Statamic fieldset components (title, heading, cont
 
 Fieldsets are ready-made Blade components linked to fields in Statamic. They make sure content is always retrieved and rendered the same way, and that every fieldset looks identical on every page. Use them for all manageable content in templates.
 
-The complete list: `accordion`, `button`, `buttons`, `content`, `heading`, `icon`, `link`, `media`, `title`, `video`.
+The complete list: `accordion`, `button`, `button-variant`, `buttons`, `content`, `heading`, `icon`, `link`, `media`, `title`, `video`.
 
 ## Before you start
 
@@ -212,6 +212,28 @@ When exactly one button is needed. Built on `link`. If more buttons are needed, 
 ```blade
 <x-fieldset.button :button="$button?->value()" />
 <x-fieldset.button :button="$button?->value()" class="mt-4" />
+```
+
+### button-variant
+
+For a button that does something on the page instead of navigating: a form submit or a popover trigger. The `button_variant` fieldset has the variant, text and icon of `button`, but no link, so editors never fill in a link that does nothing. `button` is built on it, so both look the same.
+- Import it in a group named after the button (`submit_button`), the same way `button` wraps its fields in a `button` group.
+- What the button does is set in the template with an attribute on the call (`type`, `popovertarget`, `commandfor`), never by the editor.
+
+```yaml
+-
+  handle: submit_button
+  field:
+    type: group
+    display: Verzendknop
+    fields:
+      -
+        import: button_variant
+```
+
+```blade
+<x-fieldset.button-variant :button="$submit_button?->value()" type="submit" />
+<x-fieldset.button-variant :button="$header->quick_action_button ?? null" popovertarget="quick-actions" />
 ```
 
 ### buttons
