@@ -3,11 +3,14 @@
 namespace JustBetter\StatamicStarterKit;
 
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\View;
 use JustBetter\StatamicStarterKit\Http\Controllers\CP\StarterKitFormsController;
+use JustBetter\StatamicStarterKit\Http\ViewComposers\MailGlobalsComposer;
 use Statamic\Facades\Icon;
 use Statamic\Http\Controllers\CP\Forms\FormsController;
 use Statamic\Http\Middleware\RedirectAbsoluteDomains;
 use Statamic\Providers\AddonServiceProvider;
+use Statamic\Statamic;
 
 class ServiceProvider extends AddonServiceProvider
 {
@@ -23,12 +26,20 @@ class ServiceProvider extends AddonServiceProvider
     {
         $this->loadTranslationsFrom(__DIR__.'/../lang', 'justbetter-starter-kit');
 
+        Statamic::provideToScript([
+            'justbetterStarterKit' => [
+                'convertToGlobalComponent' => config('statamic-starter-kit.convert_to_global_component'),
+            ],
+        ]);
+
         $this->app->booted(function () {
             $router = app(Router::class);
             $router->pushMiddlewareToGroup('web', RedirectAbsoluteDomains::class);
         });
 
         $this->app->singleton(FormsController::class, StarterKitFormsController::class);
+
+        View::composer('mail::*', MailGlobalsComposer::class);
 
         Icon::register('custom-svg', resource_path('svg'));
         Icon::register('custom-icons', public_path('icons'));

@@ -14,6 +14,19 @@ tabs:
               display: Logo
               localizable: false
       -
+        display: Recipients
+        fields:
+          -
+            handle: notification_email
+            field:
+              type: text
+              input_type: email
+              display: 'Notification email address'
+              instructions: 'Form notifications from this site are sent to this address.'
+              localizable: true
+              validate:
+                - email
+      -
         display: Colors
         fields:
           -
@@ -83,8 +96,8 @@ tabs:
                 - small
               remove_empty_nodes: false
               type: bard
-              display: 'Linkerkant - Tekst'
-              localizable: false
+              display: 'Left side - Text'
+              localizable: true
           -
             handle: footer_right_text
             field:
@@ -100,5 +113,5 @@ tabs:
                 - small
               remove_empty_nodes: false
               type: bard
-              display: 'Rechterkant - Tekst'
-              localizable: false
+              display: 'Right side - Text'
+              localizable: true

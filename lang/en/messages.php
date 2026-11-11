@@ -16,4 +16,6 @@ return [
     'title' => 'Title',
     'could_not_create_global_component' => 'Could not create global component.',
     'global_component_created' => 'Global component created.',
+    'yes' => 'Yes',
+    'no' => 'No',
 ];
