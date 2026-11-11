@@ -18,3 +18,19 @@ $this->call('statamic:starter-kit:install', [
 ]);
 ```
 
+## Convert to global component
+
+The Control Panel Replicator action that converts a set into a reusable global component entry is configurable. Publish the config (or set values in `config/statamic-starter-kit.php`) when your handles differ from the kit defaults.
+
+```php
+'convert_to_global_component' => [
+    'enabled' => true,
+    'collection' => 'globals',
+    'page_builder_field' => 'global_page_builder',
+    'set_handle' => 'globals_component',
+    'relationship_field' => 'globals_component',
+],
+```
+
+Set `enabled` to `false` (or `JUSTBETTER_STARTER_KIT_CONVERT_TO_GLOBAL_COMPONENT=false`) when the project does not use the entries-based global component pattern.
+
