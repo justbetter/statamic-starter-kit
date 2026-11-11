@@ -24,12 +24,44 @@ For Rapidez-specific questions, check https://docs.rapidez.io/llms.txt first.
 
 `cboxdk/statamic-mcp` gives you tools to read and change Statamic: blueprints, fieldsets, collections, navigations, globals, entries and assets. Use them to inspect the existing configuration instead of guessing, and to set up content as described in `design-to-frontend`.
 
+## Querying Statamic data
+
+- Put the query builder in its own variable with a `@var` docblock, so PHPStan and the editor know its type. Never chain directly on the facade.
+- Write every condition out in full with `->where()` and an explicit operator. Never use shortcut methods such as `whereCollection()` or `whereTaxonomy()`.
+- The one exception is status: always use `->whereStatus('published')`, never `->where('status', '=', 'published')` or `->where('published', '=', true)`.
+- Queries on entries always filter on `site` and status.
+- Type the result with a `@var` docblock as well.
+
+```php
+use Illuminate\Support\Collection;
+use Statamic\Eloquent\Entries\Entry;
+use Statamic\Eloquent\Entries\EntryQueryBuilder;
+use Statamic\Facades\Entry as EntryFacade;
+use Statamic\Facades\Site as SiteFacade;
+use Statamic\Sites\Site;
+
+/** @var Site $site */
+$site = SiteFacade::current();
+
+/** @var EntryQueryBuilder $query */
+$query = EntryFacade::query();
+
+/** @var Collection<int, Entry> $entries */
+$entries = $query
+    ->where('collection', '=', 'locations')
+    ->where('site', '=', $site->handle())
+    ->whereStatus('published')
+    ->get();
+```
+
 ## Templates
 
 - **Always Blade, never Antlers.** All components, fieldsets and pagebuilder components are Blade, so Antlers would not work with them. This also applies when other Statamic guidelines show Antlers examples.
 - **Statamic values are read with `?->value()`**, e.g. `$title?->value()`, so an empty field never causes an error. Exception: inside a replicator loop the item fields are already values (`$card_item->media`).
-- **Handles, classes and code in English.** Display names in Statamic are English too; Dutch is added through translations in `nl.json`.
+- **Values that may not exist are read with `??`**: `?? false` in conditions, `?? null` in output and props. `?->value()` only protects against an empty field, not against a variable or key that is missing: a global that is not enabled for the current site (`$brand`, `$header`), an optional key in a fieldset group or replicator item (`$button['button_text']`), or a cascade variable that only exists on some pages (`$id`). For example `@if ($brand->logo ?? false)`, `{{ $header->search_placeholder ?? null }}`, `:button="$header->button ?? null"`. A missing value then leaves that part out instead of breaking the whole page with "Undefined variable".
+- **Handles, classes and code in English.** Texts Statamic shows editors (display names, instructions, option labels, fieldset titles) are written directly in Dutch in the project's YAML, without translations in `nl.json`.
 - **PHP variables** follow Laravel conventions: short and descriptive.
+- **Translations in Blade use `@lang()`** wherever the text is output directly: in markup and in plain HTML attributes (`<span>@lang('All locations')</span>`, `aria-label="@lang('Close')"`), not `{{ __('All locations') }}`. Use `__()` only where a PHP expression is needed: component props (`:aria-label="__('Next')"`), `@php` blocks and other PHP code. `@lang()` does not escape its output, so a translation with a placeholder filled from CMS or user data also uses `{{ __('...', [...]) }}`.
 
 ## Components
 
@@ -47,6 +79,7 @@ Color tokens follow GitHub Primer's functional approach, as used by Rapidez: a t
 - `primary` (background), `primary-text` (text on primary), and optionally `primary-text-muted` and `primary-border` (muted text and borders on primary).
 - The same for `secondary` and `conversion`.
 - `primary` may also be used as a text or border color (`text-primary`, `border-primary`).
+- A lighter version of a brand color is `{color}-muted` (`secondary-muted`), following the neutral scale (`bg-muted`, `text-muted`). Never `-tint`, `-soft` or `-light`, even when the design uses those names. A darker version is `{color}-emphasis`.
 
 **Conversion.** `conversion` is only for the main goal of the site: add to cart in a webshop, or e.g. the contact form on a website whose goal is contact. One type of action, one color, so visitors learn what a color means. Never use it for other calls to action.
 
@@ -104,6 +137,8 @@ All text from the CMS is rendered with the project's own `<x-prose>` (not `x-rap
 ## JavaScript
 
 A project uses either Vue or Alpine, never both. Check `package.json` (`vue` or `alpinejs`); if unclear, check the templates for `x-data` (Alpine) or Vue components. A project with `rapidez/core` uses Vue. Only use the one the project uses.
+
+Use pnpm for JavaScript dependencies and scripts (`pnpm add`, `pnpm install`, `pnpm build`). Never add a `package-lock.json` or `yarn.lock`.
 
 ## Accessibility
 

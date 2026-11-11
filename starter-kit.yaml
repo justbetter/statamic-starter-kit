@@ -38,6 +38,7 @@ export_paths:
   - resources/views/vendor/mail
   - resources/sites.yaml
   - public/icons
+  - public/previews
   - database/migrations
   - package.json
   - vite.config.js
