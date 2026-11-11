@@ -3,7 +3,9 @@
 namespace JustBetter\StatamicStarterKit;
 
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\View;
 use JustBetter\StatamicStarterKit\Http\Controllers\CP\StarterKitFormsController;
+use JustBetter\StatamicStarterKit\Http\ViewComposers\MailGlobalsComposer;
 use Statamic\Facades\Icon;
 use Statamic\Http\Controllers\CP\Forms\FormsController;
 use Statamic\Http\Middleware\RedirectAbsoluteDomains;
@@ -29,6 +31,8 @@ class ServiceProvider extends AddonServiceProvider
         });
 
         $this->app->singleton(FormsController::class, StarterKitFormsController::class);
+
+        View::composer('mail::*', MailGlobalsComposer::class);
 
         Icon::register('custom-svg', resource_path('svg'));
         Icon::register('custom-icons', public_path('icons'));

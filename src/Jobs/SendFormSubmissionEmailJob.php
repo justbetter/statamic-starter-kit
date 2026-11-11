@@ -7,10 +7,14 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Collection;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Mail;
-use Statamic\Contracts\Forms\Submission;
+use Statamic\Contracts\Forms\Submission as SubmissionContract;
+use Statamic\Facades\Site as SiteFacade;
+use Statamic\Fields\Field;
+use Statamic\Fields\LabeledValue;
 use Statamic\Forms\Email;
+use Statamic\Forms\Submission;
 use Statamic\Sites\Site;
 
 class SendFormSubmissionEmailJob implements ShouldQueue
@@ -21,13 +25,16 @@ class SendFormSubmissionEmailJob implements ShouldQueue
      * @param  array<string, mixed>  $config
      */
     public function __construct(
-        protected Submission $submission,
+        protected SubmissionContract $submission,
         protected Site $site,
         public array $config
     ) {}
 
     public function handle(): void
     {
+        SiteFacade::setCurrent($this->site->handle());
+        app()->setLocale($this->site->lang());
+
         $this->setMailContent();
 
         /** @var string|null $mailer */
@@ -38,87 +45,69 @@ class SendFormSubmissionEmailJob implements ShouldQueue
 
     protected function setMailContent(): void
     {
-        $data = $this->submission->data();
-        /** @var Collection<int, array<string, mixed>> $fields */
-        $fields = $this->submission->fields();
-        $fieldHandles = $fields->pluck('handle')->all();
+        /** @var Submission $submission */
+        $submission = $this->submission;
         $variables = [];
         $list = '';
-        foreach ($fieldHandles as $field) {
-            /** @var array<string, mixed>|null $fieldData */
-            $fieldData = $fields->firstWhere('handle', $field);
-            /** @var string $display */
-            $display = isset($fieldData['display']) && is_string($fieldData['display']) ? $fieldData['display'] : '';
-            /** @var string|array<int|string, mixed>|object $value */
-            $value = $data[$field] ?? '';
-            $list .= '<strong>'.$display.':</strong> ';
-            $variableValues = $this->formatFieldValue($value, $list);
-            $list .= '<br>';
-            /** @var string $field */
-            $variables["{{ $field }}"] = $variableValues;
+
+        /** @var Field $field */
+        foreach ($submission->blueprint()->fields()->all() as $handle => $field) {
+            $value = $this->escapeAntlers($this->formatValue($submission->augmentedValue($handle)->value(), $field));
+            $variables['{{ '.$handle.' }}'] = $value;
+
+            if ($value !== '') {
+                $list .= '<strong>'.e((string) $field->display()).':</strong> '.$value."<br>\n";
+            }
         }
 
         $variables['{{ list }}'] = $list;
 
-        /** @var string $emailContent */
-        $emailContent = isset($this->config['email_content']) && is_string($this->config['email_content']) ? $this->config['email_content'] : '';
-        $text = strtr($emailContent, $variables);
-        $this->config['email_content'] = $text;
+        $emailContent = $this->config['email_content'] ?? '';
+        $this->config['email_content'] = strtr(is_string($emailContent) ? $emailContent : '', $variables);
     }
 
-    /**
-     * @param  string|array<int|string, mixed>|object  $value
-     */
-    protected function formatFieldValue(string|array|object $value, string &$list): string
+    protected function formatValue(mixed $value, Field $field): string
     {
+        if ($value instanceof LabeledValue) {
+            return e((string) $value->label());
+        }
+
         if (is_array($value)) {
-            return $this->formatArrayValue($value, $list);
+            return collect($value)
+                ->map(fn (mixed $item): string => $this->formatValue(is_array($item) ? ($item['label'] ?? null) : $item, $field))
+                ->filter()
+                ->implode(', ');
         }
 
-        $label = $this->extractLabelFromItem($value);
-        $list .= $label;
+        if (is_bool($value)) {
+            return $value
+                ? __('justbetter-starter-kit::messages.yes')
+                : __('justbetter-starter-kit::messages.no');
+        }
 
-        return $label;
+        if (! is_scalar($value)) {
+            return '';
+        }
+
+        if ($field->type() === 'files') {
+            return e(basename((string) $value));
+        }
+
+        if ($field->get('input_type') === 'date' && $value !== '') {
+            /** @var Carbon $date */
+            $date = Carbon::parse((string) $value)->locale($this->site->lang());
+
+            return $date->isoFormat('L');
+        }
+
+        return nl2br(e((string) $value));
     }
 
     /**
-     * @param  array<int|string, mixed>  $value
+     * Submitted values end up in the email config, which Statamic parses with Antlers.
      */
-    protected function formatArrayValue(array $value, string &$list): string
+    protected function escapeAntlers(string $value): string
     {
-        $variableValues = '';
-        foreach ($value as $key => $item) {
-            if ($key > 0) {
-                $list .= ', ';
-                $variableValues .= ', ';
-            }
-
-            $label = $this->extractLabelFromItem($item);
-            $list .= $label;
-            $variableValues .= $label;
-        }
-
-        return $variableValues;
-    }
-
-    protected function extractLabelFromItem(mixed $item): string
-    {
-        if (is_array($item) && isset($item['label'])) {
-            $labelValue = $item['label'];
-
-            return is_string($labelValue) ? $labelValue : '';
-        }
-
-        if (is_string($item)) {
-            return $item;
-        }
-
-        if (is_object($item) && method_exists($item, 'label')) {
-            $labelValue = $item->label();
-
-            return is_string($labelValue) ? $labelValue : '';
-        }
-
-        return '';
+        return str_replace(['{', '}'], ['&#123;', '&#125;'], $value);
     }
 }
