@@ -357,11 +357,12 @@ Never add margin-top or margin-bottom to the outer element. Margins between elem
 When you create a component, also create its configuration in Statamic.
 
 1. **Component fieldset**: `resources/fieldsets/component_{handle}.yaml`, which imports the fieldsets the component uses, plus any own fields.
-2. **Replicator**: add a set to the `page_builder` replicator in `resources/fieldsets/page_builder.yaml`, in the `components` group. The set imports the component fieldset.
+2. **Replicator**: add a set to the `page_builder` replicator in `resources/fieldsets/page_builder.yaml`, in the `components` group. The set imports the component fieldset and gets a preview image once the component is finished (see Preview image).
 
 ```yaml
 title_media:
   display: 'Title + media'
+  image: title_media.webp
   fields:
     -
       import: component_title_media
@@ -409,6 +410,27 @@ fields:
 
 Inside the `component_options` group, toggle and text values arrive as plain values, select values as `LabeledValue` (read them with `?->value()`) and nested groups as `Values`: `($options->decoration ?? null)?->value()`, `$options->back_link ?? false`.
 
+### Preview image
+
+Every set in the `page_builder` replicator gets a preview image, so editors recognize the component in the set picker. Statamic shows it through the `image` key on the set (see the example above).
+
+**Setup.** The starter kit ships it:
+- a `previews` disk (`public/previews`, url `/previews`);
+- a `previews` asset container (`content/assets/previews.yaml`) with uploads, renaming, moving and folder creation off, because the images are managed in git, not in the CP;
+- `'set_preview_images' => ['container' => 'previews']` in `config/statamic/assets.php`.
+
+Check that these exist before adding an image. In an older project without them, add them the same way. Never use a folder under `public/assets`: it is gitignored and never deployed.
+
+**The image:**
+- A desktop screenshot (1440px viewport) of the component's section in the design, clipped to the section with about 48px of padding above and below, because the design puts component spacing outside the element. In a Claude Design export, pages are routed through the hash (`#/page.html`); render the export in headless Chrome and screenshot the element's bounding box.
+- Resized to 1200px wide and saved as WebP (`cwebp -q 82`). That keeps each image to tens of KB; a PNG can be several MB.
+- Saved as `public/previews/{handle}.webp`.
+- Only for a component that is finished and matches the design. A placeholder component, or a design section that only looks similar (a text banner for an image banner), gets no image. A wrong preview misleads editors more than a missing one.
+
+**Syncing.** With the Eloquent asset driver, Statamic only finds an asset that has a database row. After adding or changing images, run `php please eloquent:sync-assets --container=previews` locally. Mention in your report that every environment must run it after deploying (see the starter kit README).
+
+**Check** with `php artisan tinker` that the set has a thumbnail: in `Blueprint::find('collections.pages.page')->field('page_builder')->toPublishArray()`, the set's `image` is a `/cp/thumbnails/...` URL, not empty.
+
 ## Hard rules
 
 1. **One name, three forms.** Handle and file in snake_case, type class in kebab-case, always English and based on shape.
@@ -440,6 +462,7 @@ Inside the `component_options` group, toggle and text values arrive as plain val
 - [ ] Alpine: inline `x-data` only for plain state; component files registered with `Alpine.asyncData` and used with `x-load`; state bound from Blade, elements found with `$refs`; data passed with `@js()`, translations kept in Blade
 - [ ] Vue (Rapidez): renderless components with slot props, props passed with `@js()`
 - [ ] `component_{handle}.yaml` created and set added to the `page_builder` replicator
+- [ ] Preview image `public/previews/{handle}.webp` taken from the design and set as `image` on the set; assets synced with `eloquent:sync-assets --container=previews`
 - [ ] Rarely used layout choices in `component_options`
 - [ ] Buttons, pills and small lists in the text column are sets in `content`, not component fields
 - [ ] Optional features with their own content fields are a fieldset with a `show_{feature}` toggle and `if` conditions, imported after the fieldset they extend (proposed and confirmed first); no template reads a revealer

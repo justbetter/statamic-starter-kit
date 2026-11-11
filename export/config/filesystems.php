@@ -78,6 +78,15 @@ return [
             'throw' => false,
             'report' => false,
         ],
+
+        'previews' => [
+            'driver' => 'local',
+            'root' => public_path('previews'),
+            'url' => '/previews',
+            'visibility' => 'public',
+            'throw' => false,
+            'report' => false,
+        ],
     ],
 
     /*
