@@ -246,7 +246,7 @@ Keep logic out of the markup. Data comes from PHP, behavior comes from a JavaScr
 
 When a component shows data that is not in its own fields (FAQ entries, products, stores), fetch it with a Statamic Tag. Check `app/Tags/` for an existing Tag first (the starter kit ships `Faq`).
 
-- The Tag is `app/Tags/{Name}.php`, extending `Statamic\Tags\Tags`, with typed methods (a return type plus a `@return Collection<int, Entry>` docblock).
+- The Tag is `app/Tags/{Name}.php`, extending `Statamic\Tags\Tags`, with typed methods (a return type plus a `@return Collection<int, Entry>` docblock). Helper methods are `protected`, never `private`.
 - Pass the component's fields as params. Call the Tag once in the top `@php` block:
 
 ```blade
@@ -259,6 +259,7 @@ When a component shows data that is not in its own fields (FAQ entries, products
 
 - Write one method per concern. When a component needs several kinds of data (products, step labels, URLs), give the Tag a method for each. Never write one method that returns a large array the template has to unpack into many variables.
 - Query Statamic data as described in Querying Statamic data in the JustBetter conventions. Put the query builder in its own typed variable (`/** @var EntryQueryBuilder $query */ $query = EntryFacade::query();`). Write every condition with `->where()` and an explicit operator, including `site`. Never use shortcut methods such as `whereCollection()`, except `->whereStatus('published')` for the status.
+- Read fields of the fetched entries and terms with magic properties (`$entry->city`), as described in Reading Statamic values in PHP in the JustBetter conventions; never with `get()` or `augmentedValue()`.
 - Keep the Tag thin. Heavy logic (matching, scoring, combining sources) goes into an Action in `app/Actions/` that the Tag method calls.
 
 ### Sub-parts

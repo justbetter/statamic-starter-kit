@@ -24,6 +24,10 @@ For Rapidez-specific questions, check https://docs.rapidez.io/llms.txt first.
 
 `cboxdk/statamic-mcp` gives you tools to read and change Statamic: blueprints, fieldsets, collections, navigations, globals, entries and assets. Use them to inspect the existing configuration instead of guessing, and to set up content as described in `design-to-frontend`.
 
+## PHP
+
+- Never use `private` for methods, properties or constants. Use `protected` instead, so a project or package can extend and override the class.
+
 ## Querying Statamic data
 
 - Put the query builder in its own variable with a `@var` docblock, so PHPStan and the editor know its type. Never chain directly on the facade.
@@ -52,6 +56,34 @@ $entries = $query
     ->where('site', '=', $site->handle())
     ->whereStatus('published')
     ->get();
+```
+
+## Reading Statamic values in PHP
+
+- Read fields on entries and terms with magic properties (`$entry->latitude`, `$entry->location_types`), never with `$entry->get('field')` or `$entry->augmentedValue('field')`. A magic property returns the augmented value already unwrapped (the same as `augmentedValue()->value()`), and resolves query builders such as terms and entries fields to collections, so no `?->get()` is needed.
+- Type the result with a `@var` docblock or check it with `instanceof` (`$entry->image instanceof Asset`).
+- If PHPStan reports `property.notFound` on these properties, add the Statamic classes to `universalObjectCratesClasses` in the project's `phpstan.neon`. Never fall back to `augmentedValue()` to satisfy PHPStan.
+
+```neon
+parameters:
+    universalObjectCratesClasses:
+        - Statamic\Contracts\Entries\Entry
+        - Statamic\Entries\Entry
+        - Statamic\Eloquent\Entries\Entry
+        - Statamic\Taxonomies\Term
+        - Statamic\Taxonomies\LocalizedTerm
+        - Statamic\Eloquent\Taxonomies\Term
+        - Statamic\Globals\Variables
+        - Statamic\Eloquent\Globals\Variables
+```
+
+```php
+use Statamic\Assets\Asset;
+
+/** @var string|null $city */
+$city = $entry->city;
+
+$image = $entry->image instanceof Asset ? $entry->image : null;
 ```
 
 ## Templates

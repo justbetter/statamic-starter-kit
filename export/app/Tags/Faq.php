@@ -35,7 +35,7 @@ class Faq extends Tags
     /**
      * @return Collection<int, Entry>
      */
-    private function entries(mixed $items): Collection
+    protected function entries(mixed $items): Collection
     {
         if (! $items instanceof Collection) {
             return collect();
