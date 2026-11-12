@@ -7,7 +7,7 @@ description: Use the existing Statamic fieldset components (title, heading, cont
 
 Fieldsets are ready-made Blade components linked to fields in Statamic. They make sure content is always retrieved and rendered the same way, and that every fieldset looks identical on every page. Use them for all manageable content in templates.
 
-The complete list: `accordion`, `button`, `buttons`, `content`, `heading`, `icon`, `link`, `media`, `title`, `video`.
+The complete list: `accordion`, `button`, `button-variant`, `buttons`, `content`, `heading`, `icon`, `link`, `media`, `title`, `video`.
 
 ## Before you start
 
@@ -110,24 +110,29 @@ A heading where the editor chooses the level (h1 to h6) or strong.
 
 #### Label above a title
 
-A short label above a title (an eyebrow) is a `heading`, never a text field, also when the design marks it as one. The editor chooses `strong` or a heading level that fits the page outline.
-- On the component, reference the fieldset's group with its own display name, so editors recognize it:
+A short label above a title (an eyebrow) is not a `heading`: editors must not choose a heading level for it. It is a plain text field `eyebrow` on the component:
 
 ```yaml
 -
-  handle: heading
-  field: heading.heading
-  config:
+  handle: eyebrow
+  field:
+    type: text
     display: 'Label above title'
-    hide_display: false
+    localizable: false
 ```
 
-- Render it with a project component `<x-eyebrow>` that wraps `x-fieldset.heading` and holds the label's look from the design, so the look lives in one place:
+- Render it with a project component `<x-eyebrow>` that holds the label's look from the design, so the look lives in one place. It outputs nothing when the text is empty:
 
 ```blade
-@props(['heading' => null])
+@props(['text' => null])
 
-<x-fieldset.heading :$heading :attributes="$attributes->twMerge('...')" />
+@if ($text)
+    <p {{ $attributes->twMerge('...') }}>{{ $text }}</p>
+@endif
+```
+
+```blade
+<x-eyebrow :text="$eyebrow?->value()" />
 ```
 
 ### content
@@ -212,6 +217,28 @@ When exactly one button is needed. Built on `link`. If more buttons are needed, 
 ```blade
 <x-fieldset.button :button="$button?->value()" />
 <x-fieldset.button :button="$button?->value()" class="mt-4" />
+```
+
+### button-variant
+
+For a button that does something on the page instead of navigating: a form submit or a popover trigger. The `button_variant` fieldset has the variant, text and icon of `button`, but no link, so editors never fill in a link that does nothing. `button` is built on it, so both look the same.
+- Import it in a group named after the button (`submit_button`), the same way `button` wraps its fields in a `button` group.
+- What the button does is set in the template with an attribute on the call (`type`, `popovertarget`, `commandfor`), never by the editor.
+
+```yaml
+-
+  handle: submit_button
+  field:
+    type: group
+    display: Verzendknop
+    fields:
+      -
+        import: button_variant
+```
+
+```blade
+<x-fieldset.button-variant :button="$submit_button?->value()" type="submit" />
+<x-fieldset.button-variant :button="$header->quick_action_button ?? null" popovertarget="quick-actions" />
 ```
 
 ### buttons
@@ -301,7 +328,7 @@ Styling of the label and content through slots (only when explicitly requested):
 |---|---|
 | Large title at the top of a block | `title` |
 | Subheading, card title | `heading` |
-| Short label above a title (eyebrow) | `heading` with display name "Label above title", rendered with `<x-eyebrow>` |
+| Short label above a title (eyebrow) | no fieldset: an `eyebrow` text field ("Label above title"), rendered with `<x-eyebrow>` |
 | Text, optionally with headings and buttons | `content` |
 | Buttons, pills or a short list in the text column, below or between the text | a set in `content` (existing `buttons` set, or propose a new set) |
 | Short plain text where editors must not add headings or buttons | no fieldset: a text field on the component (see `statamic-pagebuilder-components`) |
@@ -333,7 +360,7 @@ Styling of the label and content through slots (only when explicitly requested):
 - [ ] No `@if` around a single fieldset
 - [ ] At most one `<x-fieldset.title />` per template
 - [ ] Only layout/spacing classes on calls (plus font size on `heading`, color on `icon`)
-- [ ] A label above a title is the `heading` fieldset ("Label above title") rendered with `<x-eyebrow>`, not a text field
+- [ ] A label above a title is an `eyebrow` text field ("Label above title") rendered with `<x-eyebrow>`, not the `heading` fieldset
 - [ ] Design deviations solved in the component at the lowest level, not locally
 - [ ] No slots used, unless explicitly requested
 - [ ] No nested links: buttons inside a `link` have `:link="false"`, no `content` inside a `link`

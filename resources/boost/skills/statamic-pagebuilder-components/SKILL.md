@@ -132,7 +132,7 @@ Use the `content` fieldset for text, unless editors must not be able to add head
 <x-prose>{{ $description?->value() }}</x-prose>
 ```
 
-A short label above the title (eyebrow) is not a text field but the `heading` fieldset, rendered with `<x-eyebrow>` (see Label above a title in `statamic-fieldsets`).
+A short label above the title (eyebrow) is also a plain text field, with the handle `eyebrow`, rendered with `<x-eyebrow>` instead of `<x-prose>` (see Label above a title in `statamic-fieldsets`).
 
 Buttons, pills and small lists that sit in the text column, below or between the text, are sets in the `content` fieldset, not fields on the component (see `content` in `statamic-fieldsets`). Do not add a `buttons` import or a replicator for them to the component.
 
@@ -239,12 +239,14 @@ Keep logic out of the markup. Data comes from PHP, behavior comes from a JavaScr
 - Values for the whole component go in one `@php ... @endphp` block at the top of the file: shorthand variables, data from a Tag, and classes chosen from an option.
 - A small value per item in a loop (an id, a URL) may go in a short `@php` block at the start of the loop body. When an item needs more logic than that, make it a Blade component with its own `@php` block (see Sub-parts). Only do that when it makes the template clearer, not by default.
 - Fetch data in the top block, never inside a loop.
+- Conditional classes use `@class([...])`, also on a component tag (`<x-form @class(['lg:col-span-3' => $hasIntro]) />`), never `:class="Arr::toCssClasses([...])"`.
+- Pass a variable to a prop or attribute with the same name with the shorthand: `:$value`, `:$button`, not `value="{{ $value }}"`.
 
 ### Fetching data
 
 When a component shows data that is not in its own fields (FAQ entries, products, stores), fetch it with a Statamic Tag. Check `app/Tags/` for an existing Tag first (the starter kit ships `Faq`).
 
-- The Tag is `app/Tags/{Name}.php`, extending `Statamic\Tags\Tags`, with typed methods (a return type plus a `@return Collection<int, Entry>` docblock).
+- The Tag is `app/Tags/{Name}.php`, extending `Statamic\Tags\Tags`, with typed methods (a return type plus a `@return Collection<int, Entry>` docblock). Helper methods are `protected`, never `private`.
 - Pass the component's fields as params. Call the Tag once in the top `@php` block:
 
 ```blade
@@ -257,6 +259,7 @@ When a component shows data that is not in its own fields (FAQ entries, products
 
 - Write one method per concern. When a component needs several kinds of data (products, step labels, URLs), give the Tag a method for each. Never write one method that returns a large array the template has to unpack into many variables.
 - Query Statamic data as described in Querying Statamic data in the JustBetter conventions. Put the query builder in its own typed variable (`/** @var EntryQueryBuilder $query */ $query = EntryFacade::query();`). Write every condition with `->where()` and an explicit operator, including `site`. Never use shortcut methods such as `whereCollection()`, except `->whereStatus('published')` for the status.
+- Read fields of the fetched entries and terms with magic properties (`$entry->city`), as described in Reading Statamic values in PHP in the JustBetter conventions; never with `get()` or `augmentedValue()`.
 - Keep the Tag thin. Heavy logic (matching, scoring, combining sources) goes into an Action in `app/Actions/` that the Tag method calls.
 
 ### Sub-parts

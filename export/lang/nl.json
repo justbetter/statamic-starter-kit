@@ -5,10 +5,12 @@
     "Autoplay": "Automatisch afspelen",
     "Button options": "Knop opties",
     "Button text": "Button tekst",
+    "Button variant": "Knop variant",
     "Categories": "Categorieën",
     "Category": "Categorie",
     "Choose whether the frequently asked questions are loaded based on categories or manually selected.": "Kies hier of de veelgestelde vragen worden ingeladen obv categorieën of handmatig geselecteerd.",
     "Colors": "Kleuren",
+    "Component title": "Component titel",
     "Controls": "Bedieningsknoppen",
     "Download attribute": "Download attribuut",
     "Eager loading": "Eager laden",
@@ -28,6 +30,7 @@
     "Frequently asked questions": "Veelgestelde vragen",
     "Global component": "Globaal component",
     "Header background color": "Achtergrondkleur header",
+    "Heading": "Kop",
     "Heading type": "Kop type",
     "Icon position": "Icoon positie",
     "Icons": "Iconen",
@@ -50,6 +53,7 @@
     "Notification email address": "E-mailadres voor meldingen",
     "Open in new tab": "Openen in nieuw tabblad",
     "Outlined (Outline)": "Omlijnd (Outline)",
+    "Page title": "Pagina titel",
     "Preserve icon color": "Icoonkleur behouden",
     "Primary (Color)": "Primair (Kleur)",
     "Recipients": "Ontvangers",
@@ -65,8 +69,5 @@
     "Title": "Titel",
     "Title options": "Titel opties",
     "Title text": "Titel tekst",
-    "Variant": "Variant",
-    "Page title": "Pagina titel",
-    "Component title": "Component titel",
-    "Heading": "Kop"
+    "Variant": "Variant"
 }
