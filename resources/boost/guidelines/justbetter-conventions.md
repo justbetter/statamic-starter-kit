@@ -131,7 +131,7 @@ Color tokens follow GitHub Primer's functional approach, as used by Rapidez: a t
 | `border` | `border` | most common border color |
 | `border-muted` | `border-muted` | lighter border |
 
-Ring and outline colors follow the border scale (`ring-emphasis`, `outline-muted`). Some projects also have an `-active` step for selected or active states (`bg-active`, `border-active`).
+Ring and outline colors follow the border scale (`ring-emphasis`, `outline-muted`), unless the design uses a color that is not a border color. A focus ring is often a light tint instead (e.g. a light blue halo around a field): that gets its own token by purpose (`--ring-color-focus`, used as `ring-focus`) instead of the nearest border step, which would turn it dark. Some projects also have an `-active` step for selected or active states (`bg-active`, `border-active`).
 
 `border` sets a 1px border in the default color. When you only need the color, for example with `border-b`, use `border-default`.
 

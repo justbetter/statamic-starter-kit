@@ -7,13 +7,13 @@ description: Use the existing Statamic fieldset components (title, heading, cont
 
 Fieldsets are ready-made Blade components linked to fields in Statamic. They make sure content is always retrieved and rendered the same way, and that every fieldset looks identical on every page. Use them for all manageable content in templates.
 
-The complete list: `accordion`, `button`, `button-variant`, `buttons`, `content`, `heading`, `icon`, `link`, `media`, `title`, `video`.
+The complete list: `accordion`, `button`, `button-variant`, `buttons`, `content`, `heading`, `icon`, `link`, `media`, `title`.
 
 ## Before you start
 
 1. Fieldset components are in `resources/views/components/fieldset/`. Read the comments at the top of every fieldset you are going to use; they contain its usage instructions and available slots.
 2. Their Statamic configuration is in `resources/fieldsets/{name}.yaml`. Read it for the available fields and options.
-3. If no existing fieldset covers what the design needs, stop and ask, explaining why the existing fieldsets are not sufficient. Never create a fieldset yourself. You may propose one when a feature with its own content fields extends an existing fieldset (as `video` extends `media`) or is needed in several components; create it only after the developer agrees.
+3. If no existing fieldset covers what the design needs, stop and ask, explaining why the existing fieldsets are not sufficient. Never create a fieldset yourself. You may propose one when a feature with its own content fields extends an existing fieldset or is needed in several components; create it only after the developer agrees.
 
 ## Naming convention
 
@@ -42,7 +42,11 @@ Every fieldset hides its rarely used settings, so editors only see what they rea
 
 Options are handled entirely inside the fieldset component. You never have to do anything with them in a template; just pass the fieldset variable.
 
-A revealer only shows and hides fields in the CP: Statamic never saves its value, so a template that reads it sees "off" after the first save in the CP. Never read a revealer in a template. When the template must know whether a feature is on (such as `show_video` in the `video` fieldset), use a `toggle` field with `if: {toggle}: 'equals true'` on the fields it reveals; it behaves the same in the CP and its value is saved.
+A revealer only shows and hides fields in the CP: Statamic never saves its value, so a template that reads it sees "off" after the first save in the CP. Never read a revealer in a template. When the template must know whether a feature is on (such as `external_video` in `media_options`), use a `toggle` field with `if: {toggle}: 'equals true'` on the fields it reveals; it behaves the same in the CP and its value is saved.
+
+A condition can point at a field inside a sibling group with dot notation, e.g. a field next to `media_options` that depends on its toggle: `if: media_options.external_video: 'equals true'`. Use `$parent.` only to reach a field one level up (e.g. from a replicator item to the component). Several keys under `if` must all pass.
+
+Inside an `{name}_options` group, toggle and text values arrive as plain values, select values as `LabeledValue` and nested groups as `Values`. Read a toggle directly (`$media->media_options['external_video'] ?? false`); a `->value()` chain on it always returns `null`. Read a select through `->value()` (`optionalDeep($media)->media_options['object_fit']->value()->get()`).
 
 ## Composition
 
@@ -53,7 +57,7 @@ buttons   → button → link → Rapidez tag
              button → Rapidez button variant (primary, secondary, outline)
 title     → heading
 accordion → Rapidez accordion
-video     → wraps media, Rapidez button (close)
+media     → Rapidez modal (external video in a modal)
 ```
 
 Keep this in mind when something does not match the design. Change it at the lowest level where it belongs: a change to `link` also affects every `button` and `buttons`, a change to `heading` also affects every `title`, and the look of buttons and accordions lives in the Rapidez components. Rapidez components are overridden per project in `resources/views/vendor/rapidez/components/`; see the `rapidez-blade-components` skill.
@@ -153,7 +157,7 @@ Available slots: `prose`, `buttons`, `button`, `title` (only when explicitly req
 ```blade
 <x-fieldset.content :content="$content?->value()">
     <x-slot:buttons class="max-lg:flex-col"></x-slot:buttons>
-    <x-slot:prose class="prose-primary"></x-slot:prose>
+    <x-slot:prose class="prose-secondary"></x-slot:prose>
 </x-fieldset.content>
 ```
 
@@ -195,19 +199,25 @@ For an image or video.
 </div>
 ```
 
-### video
+#### External video
 
-Makes media playable: a play button on top of the media opens a YouTube or Vimeo video in a dialog. The editor turns it on with the `show_video` toggle, which reveals the link, a label on the media and a title for the dialog.
-- Import it directly after `media` in the component's fieldset, so the video settings sit with the media.
-- Wrap it around the media, with the media's shape inside it. Layout classes (width, alignment) go on the `video` call: without a video it renders its slot in a `div` with the same classes.
-- The video only loads while the dialog is open, so it stops playing when the dialog closes.
+A YouTube or Vimeo video is part of `media`, not a separate fieldset. The editor turns on "External video" (`external_video`) in the media options:
+- The asset field is replaced by a video link (`video`), and a video poster field (`video_poster`) appears.
+- Without a poster, the video is embedded directly.
+- With a poster, a play button on the poster starts the video in its place.
+- Only with a poster does "Open video in modal" (`open_in_modal`) appear; the play button then opens the video in a dialog, with a label on the poster (`video_label`) and a title above the video (`video_title`).
+- The video only loads after the play button is pressed, and in the modal it stops when the dialog closes.
+
+The play button and the inline video are positioned against the nearest positioned parent, so give the element around the media `relative` (and `group` for the hover effect). A wrapper that checks for media must also count an external video, not only the asset:
 
 ```blade
-<x-fieldset.video :video="$video?->value()" class="mx-auto max-w-xl">
-    <div class="aspect-square overflow-hidden rounded-blob">
-        <x-fieldset.media :media="$media?->value()" class="size-full" />
-    </div>
-</x-fieldset.video>
+@php
+    $hasMedia = $media?->value() && ($media?->value()['media'] || (($media?->value()->media_options['external_video'] ?? false) && $media?->value()['video']));
+@endphp
+
+<div class="group relative aspect-video overflow-hidden rounded-card">
+    <x-fieldset.media :media="$media?->value()" class="size-full" />
+</div>
 ```
 
 ### button
@@ -333,7 +343,7 @@ Styling of the label and content through slots (only when explicitly requested):
 | Buttons, pills or a short list in the text column, below or between the text | a set in `content` (existing `buttons` set, or propose a new set) |
 | Short plain text where editors must not add headings or buttons | no fieldset: a text field on the component (see `statamic-pagebuilder-components`) |
 | Standalone image or video | `media` |
-| Image with a play button that opens a YouTube or Vimeo video | `video` around `media` |
+| YouTube or Vimeo video, optionally with a poster and play button | `media` with "External video" on |
 | One button with a fixed place outside the text flow (e.g. on a card) | `button` |
 | Multiple buttons with a fixed place outside the text flow | `buttons` |
 | Clickable image or card | `link` around the relevant fieldset(s) |
