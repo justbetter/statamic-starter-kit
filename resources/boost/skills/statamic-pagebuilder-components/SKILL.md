@@ -102,6 +102,8 @@ Wrong: `text_image` (should be `content_media`), `category_tiles` or `image_slid
 
 A modifier is an extra class on the outer element that always comes from a Statamic option, never hardcoded. Add it with `@class`. `spacing.css` can use modifiers to adjust spacing.
 
+Only add a modifier when CSS or JavaScript uses it. A class without a function only adds noise to the DOM and suggests a dependency that is not there. The same goes for every other custom class, such as hooks copied from the design (`reveal`, `eyebrow`) or a class per variant when several sets share one template: leave them out until something uses them. The only exceptions are `component` and the type class, which every component always gets.
+
 ```blade
 <div @class([
     'component content-media',
@@ -122,7 +124,7 @@ Use any HTML the layout needs, and fieldsets for all content.
 
 ## Fields
 
-A component consists mainly of fieldsets. It may also have its own fields: layout options of this component (such as a background or a fullscreen option), or a short plain text (see below). Give them descriptive handles (`mirror`, not `toggle`).
+A component consists mainly of fieldsets. It may also have its own fields: layout options of this component (such as a background or a fullscreen option), which always go in the component options (see Which fields are visible), or a short plain text (see below). Give them descriptive handles (`mirror`, not `toggle`).
 
 ### Content fieldset or text field
 
@@ -369,12 +371,13 @@ title_media:
 ```
 
 3. **Dutch labels**: write every text Statamic shows editors directly in Dutch in the YAML: display names, instructions, option labels and the fieldset title. No translations in `nl.json` for them.
+4. **Colors in option labels**: an option that sets a color names that color in brackets, so editors know what they pick without trying it: `'BSO (groen)'`, `'Secundair (rood)'`. When a theme or site changes the color, name that too: `'Primair (blauw, Werken bij: groen)'`. Take the colors from the tokens in the main CSS file, including the theme overrides. This applies to every select that sets a color, also in shared fieldsets such as the button variant.
 
 ### Which fields are visible
 
 Editors should only see what they really need:
 - Fields that are filled in or changed for most uses of the component are directly visible.
-- Fields the design rarely uses go into the component options: a toggle with handle `options` (display "Component options") that reveals a group with handle `component_options`. Component options are for layout choices of the component itself, such as a decoration, a theme, a media ratio or a back link.
+- Settings of the component itself always go into the component options: a toggle with handle `options` (display "Component options") that reveals a group with handle `component_options`. These are layout choices such as a background, a decoration, a theme, a media ratio or a back link, and also the anchor ID. They go there even when the design uses them often (a background on half of the pages), so the directly visible fields are only content. Fields the design rarely uses go there too.
 - A feature with its own content fields that is off unless the editor turns it on, such as a video on the media, is its own fieldset, not part of the component options. The fieldset is one group named after the feature, with a `show_{feature}` toggle and the other fields behind `if: show_{feature}: 'equals true'`. Import it directly after the fieldset it extends (`video` after `media`), so editors find the settings where they fill in the content, and every component gets the feature by importing one fieldset. Its fieldset component checks the toggle and renders nothing (or only its slot) when it is off, so the template needs no check. Creating a fieldset is a change for the whole project: propose it and ask first (see `statamic-fieldsets`).
 - Never use a revealer for a toggle the template reads: Statamic does not save a revealer's value, so after the first save in the CP the template sees the feature as off. Use a `toggle` with `if` conditions instead.
 
@@ -436,7 +439,7 @@ Check that these exist before adding an image. In an older project without them,
 1. **One name, three forms.** Handle and file in snake_case, type class in kebab-case, always English and based on shape.
 2. **Fixed outer structure.** `component` + type class (+ modifiers from Statamic), then `container` unless a Statamic option says otherwise. Every component must be recognizable and spaceable the same way.
 3. **All content through fieldsets.** Never hardcode content; everything must be manageable in the CMS.
-4. **Modifiers only from Statamic options.** A hardcoded modifier cannot be turned off by editors.
+4. **Modifiers only from Statamic options, and only when used.** A hardcoded modifier cannot be turned off by editors, and a custom class that no CSS or JavaScript uses has no function.
 5. **Empty-content check on every wrapper.** No empty elements in the DOM.
 6. **No margins on the outer element.** `spacing.css` handles space between components.
 7. **Configuration included.** A component without its Statamic configuration cannot be used by editors.
@@ -450,6 +453,7 @@ Check that these exist before adding an image. In an older project without them,
 - [ ] Technical choices (packages, external services, new JS components, new PHP classes or endpoints, data from outside the component's fields, new collections or taxonomies) proposed and confirmed before building; maps use Google Maps
 - [ ] Handle, file name and type class match (`title_media` / `title_media.blade.php` / `title-media`), English, shape-based
 - [ ] Outer element has `component` + type class; modifiers only via `@class` from Statamic options
+- [ ] No custom classes that no CSS or JavaScript uses (modifiers, design hooks, per-variant classes); one type class per template
 - [ ] Container used, unless a Statamic option says otherwise
 - [ ] All content through `<x-fieldset.*>`
 - [ ] Repeating items in a `replicator` named `{name}_items`; item fields passed without `?->value()`
@@ -463,7 +467,8 @@ Check that these exist before adding an image. In an older project without them,
 - [ ] Vue (Rapidez): renderless components with slot props, props passed with `@js()`
 - [ ] `component_{handle}.yaml` created and set added to the `page_builder` replicator
 - [ ] Preview image `public/previews/{handle}.webp` taken from the design and set as `image` on the set; assets synced with `eloquent:sync-assets --container=previews`
-- [ ] Rarely used layout choices in `component_options`
+- [ ] Settings of the component (background, decoration, theme, anchor ID) and rarely used fields in `component_options`; directly visible fields are content only
+- [ ] Every option that sets a color names the color in brackets, including theme differences (`'Primair (blauw, Werken bij: groen)'`)
 - [ ] Buttons, pills and small lists in the text column are sets in `content`, not component fields
 - [ ] Optional features with their own content fields are a fieldset with a `show_{feature}` toggle and `if` conditions, imported after the fieldset they extend (proposed and confirmed first); no template reads a revealer
 - [ ] Display names, instructions, option labels and fieldset titles in the touched YAML written in Dutch, without `nl.json` translations
