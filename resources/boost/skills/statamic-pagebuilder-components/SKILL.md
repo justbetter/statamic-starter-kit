@@ -371,6 +371,7 @@ title_media:
 ```
 
 3. **Dutch labels**: write every text Statamic shows editors directly in Dutch in the YAML: display names, instructions, option labels and the fieldset title. No translations in `nl.json` for them.
+   Labels follow the same rule as handles: **shape, not content**. Name what the field is, not what the design happens to put in it, because editors can later use it for something else: `Filter`, not `Leeftijdsfilter`; `Tegels`, not `Kaarten` or `Locaties`; `Filtercategorie`, not `Filtersleutel` (a technical term). Content from the design belongs in the instructions as an example (`bijv. "Leeftijd van je kind"`), never in the label.
 4. **Colors in option labels**: an option that sets a color names that color in brackets, so editors know what they pick without trying it: `'BSO (groen)'`, `'Secundair (rood)'`. When a theme or site changes the color, name that too: `'Primair (blauw, Werken bij: groen)'`. Take the colors from the tokens in the main CSS file, including the theme overrides. This applies to every select that sets a color, also in shared fieldsets such as the button variant.
 
 ### Which fields are visible
@@ -378,40 +379,39 @@ title_media:
 Editors should only see what they really need:
 - Fields that are filled in or changed for most uses of the component are directly visible.
 - Settings of the component itself always go into the component options: a toggle with handle `options` (display "Component options") that reveals a group with handle `component_options`. These are layout choices such as a background, a decoration, a theme, a media ratio or a back link, and also the anchor ID. They go there even when the design uses them often (a background on half of the pages), so the directly visible fields are only content. Fields the design rarely uses go there too.
-- A feature with its own content fields that is off unless the editor turns it on, such as a video on the media, is its own fieldset, not part of the component options. The fieldset is one group named after the feature, with a `show_{feature}` toggle and the other fields behind `if: show_{feature}: 'equals true'`. Import it directly after the fieldset it extends (`video` after `media`), so editors find the settings where they fill in the content, and every component gets the feature by importing one fieldset. Its fieldset component checks the toggle and renders nothing (or only its slot) when it is off, so the template needs no check. Creating a fieldset is a change for the whole project: propose it and ask first (see `statamic-fieldsets`).
+- A variant of what a fieldset already shows is a toggle in that fieldset's own options, not a new fieldset. Example: a YouTube or Vimeo video is the "External video" toggle in `media_options`, which swaps the asset field for a video link and a poster (see External video in `statamic-fieldsets`). Fields next to the options group depend on that toggle with dot notation (`if: media_options.external_video: 'equals true'`), and fields that only make sense together stack their conditions (`video_poster: 'not empty'`).
+- A feature with its own content fields that is off unless the editor turns it on, and that extends an existing fieldset in several components, is its own fieldset, not part of the component options. The fieldset is one group named after the feature, with a `show_{feature}` toggle and the other fields behind `if: show_{feature}: 'equals true'`. Import it directly after the fieldset it extends, so editors find the settings where they fill in the content, and every component gets the feature by importing one fieldset. Its fieldset component checks the toggle and renders nothing (or only its slot) when it is off, so the template needs no check. Creating a fieldset is a change for the whole project: propose it and ask first (see `statamic-fieldsets`).
 - Never use a revealer for a toggle the template reads: Statamic does not save a revealer's value, so after the first save in the CP the template sees the feature as off. Use a `toggle` with `if` conditions instead.
+- Give every field behind a toggle `always_save: true`. Statamic does not save fields hidden by a condition, so without it the content is wiped when an editor turns the toggle off and saves, and is gone when the toggle goes back on. With `always_save` the toggle only decides whether the feature is shown. This also applies to fields inside a replicator item that depend on a toggle on the component (`if: $parent.show_filter: 'equals true'`).
+
+A feature fieldset, with a hypothetical `quote` as example:
 
 ```yaml
-title: Video
+title: Quote
 fields:
   -
-    handle: video
+    handle: quote
     field:
       type: group
-      display: Video
+      display: Quote
       hide_display: true
       fields:
         -
-          handle: show_video
+          handle: show_quote
           field:
             type: toggle
-            display: Video
+            display: Quote
         -
-          handle: video
+          handle: quote
           field:
-            type: video
-            display: 'Video link'
+            type: text
+            display: Quote
+            always_save: true
             if:
-              show_video: 'equals true'
+              show_quote: 'equals true'
 ```
 
-```blade
-<x-fieldset.video :video="$video?->value()">
-    <x-fieldset.media :media="$media?->value()" />
-</x-fieldset.video>
-```
-
-Inside the `component_options` group, toggle and text values arrive as plain values, select values as `LabeledValue` (read them with `?->value()`) and nested groups as `Values`: `($options->decoration ?? null)?->value()`, `$options->back_link ?? false`.
+Inside the `component_options` group, and every other `{name}_options` group such as `media_options`, toggle and text values arrive as plain values, select values as `LabeledValue` (read them with `?->value()`) and nested groups as `Values`: `($options->decoration ?? null)?->value()`, `$options->back_link ?? false`. A `->value()` chain on a toggle always returns `null`, so the feature silently stays off.
 
 ### Preview image
 
@@ -470,5 +470,6 @@ Check that these exist before adding an image. In an older project without them,
 - [ ] Settings of the component (background, decoration, theme, anchor ID) and rarely used fields in `component_options`; directly visible fields are content only
 - [ ] Every option that sets a color names the color in brackets, including theme differences (`'Primair (blauw, Werken bij: groen)'`)
 - [ ] Buttons, pills and small lists in the text column are sets in `content`, not component fields
-- [ ] Optional features with their own content fields are a fieldset with a `show_{feature}` toggle and `if` conditions, imported after the fieldset they extend (proposed and confirmed first); no template reads a revealer
+- [ ] Optional features with their own content fields are a fieldset with a `show_{feature}` toggle and `if` conditions, imported after the fieldset they extend (proposed and confirmed first); no template reads a revealer; fields behind a toggle have `always_save: true`
 - [ ] Display names, instructions, option labels and fieldset titles in the touched YAML written in Dutch, without `nl.json` translations
+- [ ] Labels and instructions describe the field's shape, not the design's content (`Filter`, not `Leeftijdsfilter`)

@@ -82,9 +82,7 @@ Override the Rapidez buttons in `resources/views/vendor/rapidez/components/butto
 
 ### 3. Prose
 
-Adjust `prose.css` (in `resources/css/` or `resources/css/components/`) so body text matches the design: sizes, colors and especially the spacing between elements. Change the values of the existing classes; adding new ones is rarely needed. Include the `prose-primary` modifier (see Typography in the guideline).
-
-Text on another colored background, such as a light tinted panel, gets its own modifier next to `prose-primary` in `prose.css` (e.g. `prose-emphasis`), passed through the `prose` slot of the content fieldset. Never redefine the neutral tokens (`--foreground`, `--foreground-muted`) on a panel with a utility to recolor everything inside it: that bypasses `prose.css` and also changes elements that are not text, such as icons inside a white field.
+Adjust `prose.css` (in `resources/css/` or `resources/css/components/`) so body text matches the design: sizes, colors and especially the spacing between elements. Change the values of the existing classes; adding new ones is rarely needed. Include the modifiers for text on a colored background: `prose-secondary` for a dark background and `prose-secondary-muted` for a light tinted one, passed through the `prose` slot of the content fieldset. Never redefine the neutral tokens (`--foreground`, `--foreground-muted`) on a panel with a utility to recolor everything inside it: that bypasses `prose.css` and also changes elements that are not text, such as icons inside a white field.
 
 ### 4. Titles
 
@@ -250,7 +248,8 @@ Zoom in on one component and decide, per visible element, where it comes from:
 - a plain text field on the component, only when a fieldset is more than needed (e.g. a short text without headings or buttons). Not a label above a title (eyebrow), even when the design marks it as a text field: that is the `heading` fieldset with `<x-eyebrow>` (see `statamic-fieldsets`);
 - repeating items (cards, tiles, usps), for a list of the same kind of element (see Repeating items in `statamic-pagebuilder-components`);
 - a component option, for a layout choice the editor makes (decoration, theme, ratio);
-- a fieldset with a `show_{feature}` toggle, for a feature with its own content fields that is only sometimes used, such as a video on the media. It is imported right after the fieldset it extends, never placed in the component options, and never behind a revealer (see Which fields are visible in `statamic-pagebuilder-components`);
+- a toggle in a fieldset's own options, for a variant of what that fieldset shows, such as a YouTube or Vimeo video instead of an image ("External video" in `media`);
+- a fieldset with a `show_{feature}` toggle, for a feature with its own content fields that is only sometimes used and extends a fieldset in several components. It is imported right after the fieldset it extends, never placed in the component options, and never behind a revealer (see Which fields are visible in `statamic-pagebuilder-components`);
 - not the CMS at all, for fixed UI such as slider arrows (Rapidez components).
 
 Look at the mobile and tablet versions of the component before choosing. How elements move, stack or disappear on smaller screens can decide how you group them and which fieldsets you use. <!-- TODO: confirm with the developer what the responsive views can decide -->
