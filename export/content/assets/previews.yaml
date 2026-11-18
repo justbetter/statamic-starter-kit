@@ -1,0 +1,8 @@
+title: Previews
+disk: previews
+allow_uploads: false
+allow_downloading: false
+allow_renaming: false
+allow_moving: false
+create_folders: false
+warm_presets: false

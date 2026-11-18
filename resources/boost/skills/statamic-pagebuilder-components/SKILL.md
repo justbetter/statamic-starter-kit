@@ -19,9 +19,48 @@ Header and footer are not pagebuilder components.
    - it is unclear which component type the design shows;
    - it is unclear which fieldsets a part of the design needs;
    - the design needs something no existing fieldset covers;
-   - the design contains a slider (there is no slider fieldset; the solution is project-specific).
+   - it is unclear whether a part of the design is a slider, or how it behaves (autoplay, loop); how a slider is built is fixed (see Sliders).
 
 While working, briefly state which files and skills you read and why. If you notice you are missing context halfway through, read the relevant files again before continuing.
+
+## Technical proposal
+
+Some choices decide how a component works under the hood. They are expensive to undo and easy to miss in a review. Propose them before you build and wait for the developer to confirm. Do this when the component needs:
+
+- a new npm or Composer package, or an external service (maps, video, reviews, search, embeds);
+- a new JavaScript component (Alpine or Vue), instead of reusing an existing one;
+- a new PHP class or endpoint: a Tag, Action, controller, route or API endpoint;
+- data that does not come from the component's own fields: a collection, taxonomy, global or external API.
+
+Present the choices as a table, one row per choice:
+
+| Choice | Proposal | Default or new | Why | Alternatives |
+|---|---|---|---|---|
+| Map | Google Maps in an Alpine `map` component with `@googlemaps/js-api-loader` | default | the design shows an interactive map with several pins | static map image |
+| Data | new `stores` collection | new | the same stores also appear on their own pages | replicator on the component |
+
+When a default exists (Maps below, Sliders, Logic), put it in the proposal as the choice; do not ask an open question about it. Never choose a different library or service than the default without the developer's explicit agreement, even when the design's prototype uses one.
+
+When you work from `design-to-frontend`, these choices are part of the breakdown proposal, not a separate round.
+
+### Collections and taxonomies
+
+Never create a collection or taxonomy on your own. Use an existing one when it fits. Otherwise include in the proposal:
+
+- **Whether it should be one at all**: a collection or taxonomy, or a replicator on the component (`{name}_items`), a global or a select field. A collection fits when the same items appear in several places, get their own page, or are filtered by category (a taxonomy).
+- **Name and handle**: an English snake_case handle and a Dutch display name.
+- **Blueprint fields**: the fields of an entry or term, with the fieldsets they import.
+- **Routes and pages**: whether entries get their own detail page (route and template) and an overview page, or are only shown inside components.
+
+The `faq` collection shows the pattern for items shown in a component: the content lives in the collection, with a taxonomy for categories. The component selects items manually or by category, through a Tag (see Fetching data).
+
+### Maps
+
+Maps use Google Maps. Never use OpenStreetMap, Leaflet, Mapbox or another provider without the developer's explicit agreement.
+
+- **Statamic-only projects (Alpine)**: an Alpine component that follows the Logic rules (`asyncData` + `x-load`, options passed with `@js()`) and loads Google Maps with `@googlemaps/js-api-loader`. Add `@googlemaps/markerclusterer` only when there are many markers. For one fixed location without interaction, use a Static Maps image (`https://maps.googleapis.com/maps/api/staticmap?...`) and no JavaScript. The key is `config('services.google_maps_api_key')`, from `MAPS_KEY` in `.env`; pass it to the component as an option.
+- **Rapidez projects (Vue)**: `vue3-google-map` (`<google-map>`, `<google-marker>`) inside a renderless Vue component that holds the logic (see Logic). The key reaches the frontend through `config(['frontend.maps' => ['key' => ...]])` and is used as `config.maps.key`.
+- **Reference implementations**, when available: fietsenwinkel-rapidez (`page_builder/location_maps`, `resources/js/components/Gmap.vue`) and BerendBotje (`resources/js/components/maps.js`, `resources/js/utils/maps/`). BerendBotje registers its component with `Alpine.data` and positional arguments; follow the Logic rules instead.
 
 ## Naming
 
@@ -55,11 +94,15 @@ Wrong: `text_image` (should be `content_media`), `category_tiles` or `image_slid
 ```
 
 ### Outer element
+
 - Classes: `component`, the type class, and optionally modifiers.
 - May be a `<section>` instead of a `<div>` when that is semantically correct.
 
 ### Modifiers
+
 A modifier is an extra class on the outer element that always comes from a Statamic option, never hardcoded. Add it with `@class`. `spacing.css` can use modifiers to adjust spacing.
+
+Only add a modifier when CSS or JavaScript uses it. A class without a function only adds noise to the DOM and suggests a dependency that is not there. The same goes for every other custom class, such as hooks copied from the design (`reveal`, `eyebrow`) or a class per variant when several sets share one template: leave them out until something uses them. The only exceptions are `component` and the type class, which every component always gets.
 
 ```blade
 <div @class([
@@ -69,27 +112,35 @@ A modifier is an extra class on the outer element that always comes from a Stata
 ```
 
 ### Container
+
 - The second element has only the class `container`.
 - Always use it, unless a Statamic option says otherwise (e.g. a fullscreen option on a banner).
 - Use `md:container` when content must sit in the container on desktop but run edge to edge on mobile.
 - You do not need to know whether the component is rendered inside another container: nested containers lose their padding through CSS.
 
 ### Inside the container
+
 Use any HTML the layout needs, and fieldsets for all content.
 
 ## Fields
 
-A component consists mainly of fieldsets. It may also have its own fields: layout options of this component (such as a background or a fullscreen option), or a short plain text (see below). Give them descriptive handles (`mirror`, not `toggle`).
+A component consists mainly of fieldsets. It may also have its own fields: layout options of this component (such as a background or a fullscreen option), which always go in the component options (see Which fields are visible), or a short plain text (see below). Give them descriptive handles (`mirror`, not `toggle`).
 
 ### Content fieldset or text field
-Use the `content` fieldset for text, unless editors must not be able to add headings or buttons, such as a short subtitle or description. Then use a plain text field on the component, and render it with `<x-prose>` so the typography stays the same:
+
+Use the `content` fieldset for text, unless editors must not be able to add headings or buttons, such as a short description. Then use a plain text field on the component, and render it with `<x-prose>` so the typography stays the same:
 
 ```blade
 <x-prose>{{ $description?->value() }}</x-prose>
 ```
 
+A short label above the title (eyebrow) is also a plain text field, with the handle `eyebrow`, rendered with `<x-eyebrow>` instead of `<x-prose>` (see Label above a title in `statamic-fieldsets`).
+
+Buttons, pills and small lists that sit in the text column, below or between the text, are sets in the `content` fieldset, not fields on the component (see `content` in `statamic-fieldsets`). Do not add a `buttons` import or a replicator for them to the component.
+
 ### Repeating items
-Lists of the same kind of element (cards, tiles, usps, logos) are a replicator field, so editors can add, remove and reorder items.
+
+Lists of the same kind of element (cards, tiles, usps, logos) are a replicator field, so editors can add, remove and reorder items. This is for lists that form their own part of the layout, such as a grid of cards; a short list inside the text column is a set in `content`.
 
 - Field type: always `replicator`.
 - Name: `{name}_items`, e.g. `card_items`, `usp_items`. Use this for every new component, so all lists are recognizable.
@@ -133,10 +184,32 @@ field:
 @endif
 ```
 
+### Sliders
+
+A row of items that scrolls horizontally (cards, media, logos) is a slider. There is no slider fieldset: the items are repeating items or entries, and the slider is only how they are laid out.
+
+In Statamic-only projects (Alpine), sliders use [Embla](https://www.embla-carousel.com/) (`embla-carousel`, the vanilla core), never a custom scroll-snap script or another library, even when the design's prototype uses one. Rapidez projects (Vue) follow Rapidez's own slider setup instead.
+
+- One Alpine component for every slider, `resources/js/components/carousel.js`, registered lazily as `Alpine.asyncData('carousel', …)` and used with `x-data="carousel" x-load` (see Logic). Reuse it; add an option to it instead of writing a second slider. It creates Embla on `$refs.viewport` (`align: 'start'`, `containScroll: 'trimSnaps'`), exposes `canPrevious`, `canNext` and `overflows` (updated on `init`, `select` and `reInit`) and the methods `previous()` and `next()`, and destroys Embla in `destroy()`. Keep the Embla instance outside Alpine's reactive data (a variable in the factory's closure), because Alpine's proxy breaks it.
+- Markup: `x-data="carousel" x-load` on the component, then a viewport with `x-ref="viewport"` and `overflow-hidden`, then a flex container with `-mx-3 touch-pan-y touch-pinch-zoom`, then a wrapper per slide with `min-w-0 shrink-0 px-3` and a plain fraction per breakpoint (`basis-10/12 md:basis-1/2 lg:basis-1/3`). The space between slides is horizontal padding on the wrappers (half the gap on each side) with the same negative margin on the container, not `gap`, so the fractions add up to 100% without `calc()` and the first and last slide line up with the container edges. Without `touch-pan-y` the browser takes over horizontal swipes and dragging silently does nothing on touch screens.
+- Room for hover effects: the viewport clips its content, so give it vertical padding when slides lift or cast a shadow on hover (`pt-2 pb-6`). For a next slide that peeks in on mobile, let the viewport run to the screen edge (`-mx-6 px-6 md:mx-0 md:px-0`, matching the container padding).
+- Arrows: `<x-rapidez::button.slider>` with an `aria-label`, bound to `previous`/`next` and disabled with `x-bind:disabled="!canPrevious"` / `"!canNext"`. Show them only when there is something to scroll (`x-show="overflows"`, with `x-cloak`); on touch screens swiping is enough when the design hides them.
+- Reduced motion: scroll without animation when `prefers-reduced-motion: reduce` is set (`embla.scrollNext(true)`); autoplay is never used then.
+- Test swiping in the browser at mobile width. A headless browser does not pass CDP touch input to Embla; dispatch `TouchEvent`s from the page instead.
+
 ### Variables in the template
+
 `page_builder.blade.php` includes each component with all fields of its set as variables, including the set's unique `$id`. Each fieldset arrives as one variable with the same name (see the `statamic-fieldsets` skill).
 
-Do not wrap the whole component in an empty-content check. Editors can disable a component in Statamic, and an empty component should be removed by the editor.
+Do not wrap the whole component in an empty-content check because of optional fields such as a title or content. Editors can disable a component in Statamic, and an empty component should be removed by the editor. The exception is a component that is meaningless without its main data: fetched items (FAQ entries, products), its main list of repeating items, or a form. Wrap the whole component in a check on that data only:
+
+```blade
+@if ($faqItems->isNotEmpty())
+    <div class="component faq">
+        ...
+    </div>
+@endif
+```
 
 ## Wrappers around fieldsets
 
@@ -159,9 +232,93 @@ Take the condition from the top of each fieldset file, apply it to the `?->value
 </div>
 ```
 
-## Variables
+## Logic
 
-When you need shorthand variables, define them in a `@php ... @endphp` block at the top of the file, so all logic is in one place and the markup stays readable.
+Keep logic out of the markup. Data comes from PHP, behavior comes from a JavaScript component, and the Blade file connects the two.
+
+### PHP in the template
+
+- Values for the whole component go in one `@php ... @endphp` block at the top of the file: shorthand variables, data from a Tag, and classes chosen from an option.
+- A small value per item in a loop (an id, a URL) may go in a short `@php` block at the start of the loop body. When an item needs more logic than that, make it a Blade component with its own `@php` block (see Sub-parts). Only do that when it makes the template clearer, not by default.
+- Fetch data in the top block, never inside a loop.
+- Conditional classes use `@class([...])`, also on a component tag (`<x-form @class(['lg:col-span-3' => $hasIntro]) />`), never `:class="Arr::toCssClasses([...])"`.
+- Pass a variable to a prop or attribute with the same name with the shorthand: `:$value`, `:$button`, not `value="{{ $value }}"`.
+
+### Fetching data
+
+When a component shows data that is not in its own fields (FAQ entries, products, stores), fetch it with a Statamic Tag. Check `app/Tags/` for an existing Tag first (the starter kit ships `Faq`).
+
+- The Tag is `app/Tags/{Name}.php`, extending `Statamic\Tags\Tags`, with typed methods (a return type plus a `@return Collection<int, Entry>` docblock). Helper methods are `protected`, never `private`.
+- Pass the component's fields as params. Call the Tag once in the top `@php` block:
+
+```blade
+@php
+    $faqItems = \Statamic\Statamic::tag('faq:getItems')
+        ->params(['type' => $faq_type?->value()?->value(), 'items' => $faq_items?->get(), 'categories' => $faq_categories?->get()])
+        ->fetch();
+@endphp
+```
+
+- Write one method per concern. When a component needs several kinds of data (products, step labels, URLs), give the Tag a method for each. Never write one method that returns a large array the template has to unpack into many variables.
+- Query Statamic data as described in Querying Statamic data in the JustBetter conventions. Put the query builder in its own typed variable (`/** @var EntryQueryBuilder $query */ $query = EntryFacade::query();`). Write every condition with `->where()` and an explicit operator, including `site`. Never use shortcut methods such as `whereCollection()`, except `->whereStatus('published')` for the status.
+- Read fields of the fetched entries and terms with magic properties (`$entry->city`), as described in Reading Statamic values in PHP in the JustBetter conventions; never with `get()` or `augmentedValue()`.
+- Keep the Tag thin. Heavy logic (matching, scoring, combining sources) goes into an Action in `app/Actions/` that the Tag method calls.
+
+### Sub-parts
+
+- Split a large component, or one with alternative layouts (a fullscreen variant, a map with filters), into partials in `resources/views/page_builder/{handle}/{part}.blade.php`. Include them with `@include('page_builder.{handle}.{part}')`. The main file keeps the `@php` block and the outer structure, and includes the parts in order.
+- A part becomes a Blade component in `resources/views/components/` when another component or page reuses it, or when it is a loop item with its own logic (e.g. `<x-tile :$tile />`).
+
+### JavaScript in Statamic-only projects (Alpine)
+
+Use native HTML and CSS first (`<details>`, `popover`, `<dialog>`). Use Alpine only for what they cannot do.
+
+**Inline or file.** Inline `x-data` is only for state toggled from the markup: `x-data="{ open: false }"`. As soon as you need a method, `init()`, a library or a fetch, write a component file `resources/js/components/{name}.js` (camelCase). Check that folder for an existing component first.
+
+**Registering.** Always load components lazily. Register them in `resources/js/site.js`:
+
+```js
+Alpine.asyncData('openingTimes', () => import('./components/openingTimes.js'));
+```
+
+and put `x-load` on every element that uses the component: `<div x-data="openingTimes(...)" x-load>`. Without `x-load` the component never loads.
+
+**Shape.** A component file exports a factory: `export default (options = {}) => ({ ... })`. Keep library instances (Embla, a map) out of Alpine's reactive data, as a variable in the factory's closure, because Alpine's proxy breaks them. Clean them up in `destroy()`.
+
+**Connecting to the markup.** The component exposes state and methods. Blade binds them with `x-on:click="next"`, `x-bind:disabled="!canNext"`, `x-show` and `x-text`. Find elements with `x-ref` / `$refs`, never with class selectors. Only when a library cannot work through bindings may the JavaScript attach listeners or set attributes itself, and it still finds the elements through `$refs`.
+
+**Passing data.**
+- Pass config, URLs and data (arrays, collections) as factory arguments with `@js()`: `x-data="openingTimes(@js($endpoint))"`. Do not use `data-*` attributes or `json_encode`.
+- Translations stay in Blade: render the text with `@lang()` in the markup and let the component toggle what is shown. Do not pass translations into the component.
+
+**Sharing and communication.**
+- To extend a component, spread its factory: `({ ...formSubmit(), submitWizard() { ... } })`.
+- Put plain helper functions shared by several components in `resources/js/utils/` and import them.
+- State that several components on the page read goes in an `Alpine.store`, registered in `site.js`.
+- Separate components talk through events: `$dispatch('set-sticky-bar', true)` on one side and `x-on:set-sticky-bar.window` on the other. A component never reaches into another component.
+
+### JavaScript in Rapidez projects (Vue)
+
+- Build JavaScript components as renderless Vue components in `resources/js/components/{Name}.vue`. Rapidez registers them by file name in kebab-case; use `.lazy.vue` for lazy loading. The component only holds logic and exposes state and methods as slot props. Markup, classes and translations stay in Blade.
+- Pass props from Blade with `@js()`, not `json_encode`.
+
+```blade
+<hotspot-image v-slot="{ activeHotspot, setActiveHotspot }">
+    <div v-on:mouseenter="setActiveHotspot(@js($hotspot['id']))" ...>
+</hotspot-image>
+```
+
+```js
+export default {
+    data: () => ({ activeHotspot: null }),
+    methods: {
+        setActiveHotspot(id) { this.activeHotspot = id },
+    },
+    render() {
+        return this.$slots.default?.({ activeHotspot: this.activeHotspot, setActiveHotspot: this.setActiveHotspot })
+    },
+}
+```
 
 ## Spacing
 
@@ -205,44 +362,117 @@ Never add margin-top or margin-bottom to the outer element. Margins between elem
 When you create a component, also create its configuration in Statamic.
 
 1. **Component fieldset**: `resources/fieldsets/component_{handle}.yaml`, which imports the fieldsets the component uses, plus any own fields.
-2. **Replicator**: add a set to the `page_builder` replicator in `resources/fieldsets/page_builder.yaml`, in the `components` group. The set imports the component fieldset.
+2. **Replicator**: add a set to the `page_builder` replicator in `resources/fieldsets/page_builder.yaml`, in the `components` group. The set imports the component fieldset and gets a preview image once the component is finished (see Preview image).
 
 ```yaml
 title_media:
   display: 'Title + media'
+  image: title_media.webp
   fields:
     -
       import: component_title_media
 ```
 
-3. **Translations**: add Dutch translations for new display names to `nl.json`.
+3. **Dutch labels**: write every text Statamic shows editors directly in Dutch in the YAML: display names, instructions, option labels and the fieldset title. No translations in `nl.json` for them.
+   Labels follow the same rule as handles: **shape, not content**. Name what the field is, not what the design happens to put in it, because editors can later use it for something else: `Filter`, not `Leeftijdsfilter`; `Tegels`, not `Kaarten` or `Locaties`; `Filtercategorie`, not `Filtersleutel` (a technical term). Content from the design belongs in the instructions as an example (`bijv. "Leeftijd van je kind"`), never in the label.
+4. **Colors in option labels**: an option that sets a color names that color in brackets, so editors know what they pick without trying it: `'BSO (groen)'`, `'Secundair (rood)'`. When a theme or site changes the color, name that too: `'Primair (blauw, Werken bij: groen)'`. Take the colors from the tokens in the main CSS file, including the theme overrides. This applies to every select that sets a color, also in shared fieldsets such as the button variant.
 
 ### Which fields are visible
+
 Editors should only see what they really need:
 - Fields that are filled in or changed for most uses of the component are directly visible.
-- Fields the design rarely uses go into the component options: a toggle with handle `options` (display "Component options") that reveals a group with handle `component_options`.
+- Settings of the component itself always go into the component options: a toggle with handle `options` (display "Component options") that reveals a group with handle `component_options`. These are layout choices such as a background, a decoration, a theme, a media ratio or a back link, and also the anchor ID. They go there even when the design uses them often (a background on half of the pages), so the directly visible fields are only content. Fields the design rarely uses go there too.
+- A variant of what a fieldset already shows is a toggle in that fieldset's own options, not a new fieldset. Example: a YouTube or Vimeo video is the "External video" toggle in `media_options`, which swaps the asset field for a video link and a poster (see External video in `statamic-fieldsets`). Fields next to the options group depend on that toggle with dot notation (`if: media_options.external_video: 'equals true'`), and fields that only make sense together stack their conditions (`video_poster: 'not empty'`).
+- A feature with its own content fields that is off unless the editor turns it on, and that extends an existing fieldset in several components, is its own fieldset, not part of the component options. The fieldset is one group named after the feature, with a `show_{feature}` toggle and the other fields behind `if: show_{feature}: 'equals true'`. Import it directly after the fieldset it extends, so editors find the settings where they fill in the content, and every component gets the feature by importing one fieldset. Its fieldset component checks the toggle and renders nothing (or only its slot) when it is off, so the template needs no check. Creating a fieldset is a change for the whole project: propose it and ask first (see `statamic-fieldsets`).
+- Never use a revealer for a toggle the template reads: Statamic does not save a revealer's value, so after the first save in the CP the template sees the feature as off. Use a `toggle` with `if` conditions instead.
+- Give every field behind a toggle `always_save: true`. Statamic does not save fields hidden by a condition, so without it the content is wiped when an editor turns the toggle off and saves, and is gone when the toggle goes back on. With `always_save` the toggle only decides whether the feature is shown. This also applies to fields inside a replicator item that depend on a toggle on the component (`if: $parent.show_filter: 'equals true'`).
+
+A feature fieldset, with a hypothetical `quote` as example:
+
+```yaml
+title: Quote
+fields:
+  -
+    handle: quote
+    field:
+      type: group
+      display: Quote
+      hide_display: true
+      fields:
+        -
+          handle: show_quote
+          field:
+            type: toggle
+            display: Quote
+        -
+          handle: quote
+          field:
+            type: text
+            display: Quote
+            always_save: true
+            if:
+              show_quote: 'equals true'
+```
+
+Inside the `component_options` group, and every other `{name}_options` group such as `media_options`, toggle and text values arrive as plain values, select values as `LabeledValue` (read them with `?->value()`) and nested groups as `Values`: `($options->decoration ?? null)?->value()`, `$options->back_link ?? false`. A `->value()` chain on a toggle always returns `null`, so the feature silently stays off.
+
+### Preview image
+
+Every set in the `page_builder` replicator gets a preview image, so editors recognize the component in the set picker. Statamic shows it through the `image` key on the set (see the example above).
+
+**Setup.** The starter kit ships it:
+- a `previews` disk (`public/previews`, url `/previews`);
+- a `previews` asset container (`content/assets/previews.yaml`) with uploads, renaming, moving and folder creation off, because the images are managed in git, not in the CP;
+- `'set_preview_images' => ['container' => 'previews']` in `config/statamic/assets.php`.
+
+Check that these exist before adding an image. In an older project without them, add them the same way. Never use a folder under `public/assets`: it is gitignored and never deployed.
+
+**The image:**
+- A desktop screenshot (1440px viewport) of the component's section in the design, clipped to the section with about 48px of padding above and below, because the design puts component spacing outside the element. In a Claude Design export, pages are routed through the hash (`#/page.html`); render the export in headless Chrome and screenshot the element's bounding box.
+- Resized to 1200px wide and saved as WebP (`cwebp -q 82`). That keeps each image to tens of KB; a PNG can be several MB.
+- Saved as `public/previews/{handle}.webp`.
+- Only for a component that is finished and matches the design. A placeholder component, or a design section that only looks similar (a text banner for an image banner), gets no image. A wrong preview misleads editors more than a missing one.
+
+**Syncing.** With the Eloquent asset driver, Statamic only finds an asset that has a database row. After adding or changing images, run `php please eloquent:sync-assets --container=previews` locally. Mention in your report that every environment must run it after deploying (see the starter kit README).
+
+**Check** with `php artisan tinker` that the set has a thumbnail: in `Blueprint::find('collections.pages.page')->field('page_builder')->toPublishArray()`, the set's `image` is a `/cp/thumbnails/...` URL, not empty.
 
 ## Hard rules
 
 1. **One name, three forms.** Handle and file in snake_case, type class in kebab-case, always English and based on shape.
 2. **Fixed outer structure.** `component` + type class (+ modifiers from Statamic), then `container` unless a Statamic option says otherwise. Every component must be recognizable and spaceable the same way.
 3. **All content through fieldsets.** Never hardcode content; everything must be manageable in the CMS.
-4. **Modifiers only from Statamic options.** A hardcoded modifier cannot be turned off by editors.
+4. **Modifiers only from Statamic options, and only when used.** A hardcoded modifier cannot be turned off by editors, and a custom class that no CSS or JavaScript uses has no function.
 5. **Empty-content check on every wrapper.** No empty elements in the DOM.
 6. **No margins on the outer element.** `spacing.css` handles space between components.
 7. **Configuration included.** A component without its Statamic configuration cannot be used by editors.
 8. **Ask when information is missing.** A wrong guess costs more than a question.
+9. **Sliders use Embla** through the shared `carousel` Alpine component (Statamic-only projects). No custom slider scripts.
+10. **Logic outside the markup.** Fetched data comes from Tag methods called in the top `@php` block. Behavior lives in Alpine components (`asyncData` + `x-load`, bound from Blade) or in renderless Vue components (Rapidez).
+11. **Propose technical choices first.** New packages, external services, JavaScript components, PHP classes or endpoints, and data from outside the component's fields (including new collections and taxonomies) are proposed and confirmed before you build. Defaults such as Google Maps and Embla are never swapped without agreement.
 
 ## Checklist before delivery
 
+- [ ] Technical choices (packages, external services, new JS components, new PHP classes or endpoints, data from outside the component's fields, new collections or taxonomies) proposed and confirmed before building; maps use Google Maps
 - [ ] Handle, file name and type class match (`title_media` / `title_media.blade.php` / `title-media`), English, shape-based
 - [ ] Outer element has `component` + type class; modifiers only via `@class` from Statamic options
+- [ ] No custom classes that no CSS or JavaScript uses (modifiers, design hooks, per-variant classes); one type class per template
 - [ ] Container used, unless a Statamic option says otherwise
 - [ ] All content through `<x-fieldset.*>`
 - [ ] Repeating items in a `replicator` named `{name}_items`; item fields passed without `?->value()`
-- [ ] Every wrapper has an empty-content check
+- [ ] Every wrapper has an empty-content check; the whole component is wrapped only for its main data (fetched items, main list, form)
+- [ ] Sliders use the `carousel` Alpine component with Embla (`touch-pan-y touch-pinch-zoom` on the container, `button.slider` arrows with `aria-label`, reduced motion handled), checked by swiping at mobile width
 - [ ] No margins on the outer element; spacing exceptions added only for clear differences, and reported
-- [ ] Shorthand variables in `@php` at the top
+- [ ] Component-level values and data fetching in the `@php` block at the top; only small per-item values in loops
+- [ ] Fetched data comes from a Tag in `app/Tags/`, with one method per concern; heavy logic in an Action
+- [ ] Partials in `page_builder/{handle}/`; Blade components only for reused parts or loop items with their own logic
+- [ ] Alpine: inline `x-data` only for plain state; component files registered with `Alpine.asyncData` and used with `x-load`; state bound from Blade, elements found with `$refs`; data passed with `@js()`, translations kept in Blade
+- [ ] Vue (Rapidez): renderless components with slot props, props passed with `@js()`
 - [ ] `component_{handle}.yaml` created and set added to the `page_builder` replicator
-- [ ] Rarely used fields in `component_options`
-- [ ] Dutch translations added to `nl.json`
+- [ ] Preview image `public/previews/{handle}.webp` taken from the design and set as `image` on the set; assets synced with `eloquent:sync-assets --container=previews`
+- [ ] Settings of the component (background, decoration, theme, anchor ID) and rarely used fields in `component_options`; directly visible fields are content only
+- [ ] Every option that sets a color names the color in brackets, including theme differences (`'Primair (blauw, Werken bij: groen)'`)
+- [ ] Buttons, pills and small lists in the text column are sets in `content`, not component fields
+- [ ] Optional features with their own content fields are a fieldset with a `show_{feature}` toggle and `if` conditions, imported after the fieldset they extend (proposed and confirmed first); no template reads a revealer; fields behind a toggle have `always_save: true`
+- [ ] Display names, instructions, option labels and fieldset titles in the touched YAML written in Dutch, without `nl.json` translations
+- [ ] Labels and instructions describe the field's shape, not the design's content (`Filter`, not `Leeftijdsfilter`)

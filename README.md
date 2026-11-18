@@ -34,3 +34,11 @@ The Control Panel Replicator action that converts a set into a reusable global c
 
 Set `enabled` to `false` (or `JUSTBETTER_STARTER_KIT_CONVERT_TO_GLOBAL_COMPONENT=false`) when the project does not use the entries-based global component pattern.
 
+## Deploying
+
+Pagebuilder set preview images live in `public/previews` and are committed to git. With the Eloquent asset driver, Statamic only shows an image that has a database row. Add this to every environment's deploy script:
+
+```bash
+php please eloquent:sync-assets --container=previews
+```
+

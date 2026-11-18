@@ -71,7 +71,7 @@ class GlobalComponentController extends CpController
         ];
     }
 
-    private function uniqueSlug(StatamicCollection $collection, string $siteHandle, string $title): string
+    protected function uniqueSlug(StatamicCollection $collection, string $siteHandle, string $title): string
     {
         $baseSlug = str($title)->slug()->toString();
         $slug = $baseSlug;
