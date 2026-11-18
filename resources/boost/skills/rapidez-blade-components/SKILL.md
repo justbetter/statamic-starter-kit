@@ -59,6 +59,7 @@ There is no combined input + label component, because attributes cannot be split
 - `x-rapidez::label` is a styled `<span>`. It adds an asterisk automatically when the field is `required`; hide it with `class="after:hidden"`.
 - `x-rapidez::input`, `x-rapidez::input.textarea` and `x-rapidez::input.select` are the fields themselves. All attributes go to the field.
 - Checkbox and radio do include their label: the slot is the label text, all attributes go to the input. Use `.base` for the input without a label.
+- A group of checkboxes or radios goes in a `<fieldset>` with the group label in a `<legend>` around `x-rapidez::label`. Don't change the label component to render a `legend` itself.
 - Invalid fields get a red border after the user has interacted with them (`:user-invalid`).
 - In Vue, put a condition on a `<template>` around a checkbox or radio (`<template v-if="…">`), not on the component itself, because the component renders a `<label>` around the input.
 
@@ -78,6 +79,13 @@ There is no combined input + label component, because attributes cannot be split
 <x-rapidez::input.checkbox name="newsletter">
     @lang('Subscribe to the newsletter')
 </x-rapidez::input.checkbox>
+
+<fieldset>
+    <legend><x-rapidez::label>@lang('Days')</x-rapidez::label></legend>
+    @foreach ($days as $value => $day)
+        <x-rapidez::input.checkbox name="days[]" :$value>{{ $day }}</x-rapidez::input.checkbox>
+    @endforeach
+</fieldset>
 ```
 
 ## Accordion
