@@ -16,7 +16,6 @@ class StarterKitPostInstall
     protected string $env = '';
     protected string $app = '';
     protected string $sites = '';
-    protected bool $rapidezStatamic = false;
 
     /**
      * Repositories that Multisite renames by site handle.
@@ -32,129 +31,18 @@ class StarterKitPostInstall
     public function handle(): void
     {
         info('🚀 Setting up your JustBetter Statamic starter kit...');
-        
-        $this->installDependencies();
-        
-        if (confirm('Do you want to setup for a Rapidez Statamic project?', false)) {
-            $this->setupRapidezStatamic();
-        }
-        
+
         $this->configureProject();
         $this->setupDatabase();
         $this->setupMultisite();
         $this->importEloquentContent();
-        
+
         info('✅ Starter kit installation completed!');
-    }
-
-    protected function installDependencies(): void
-    {
-        $addons = $this->selectAddons();
-        
-        if (!empty($addons)) {
-            $this->runCommand('composer require ' . implode(' ', $addons), 'Installing selected addons...');
-        }
-    }
-
-    protected function selectAddons(): array
-    {
-        $addons = [];
-
-        $seoAddon = select(
-            'Which SEO addon do you want to use?',
-            [
-                'statamic/seo-pro' => 'Statamic SEO Pro',
-                'none' => 'None',
-            ],
-            'none'
-        );
-
-        if ($seoAddon !== 'none') {
-            $addons[] = $seoAddon;
-            
-            if ($seoAddon === 'statamic/seo-pro') {
-                $this->copySeoProTemplates();
-            }
-        }
-
-        $cacheAddon = select(
-            'Which cache addon do you want to use?',
-            [
-                'justbetter/statamic-cloudflare-purge' => 'Cloudflare Purge',
-                'none' => 'None',
-            ],
-            'none'
-        );
-
-        if ($cacheAddon !== 'none') {
-            $addons[] = $cacheAddon;
-        }
-
-        $structuredDataAddon = select(
-            'Which structured data addon do you want to use?',
-            [
-                'justbetter/statamic-structured-data' => 'Structured Data',
-                'none' => 'None',
-            ],
-            'none'
-        );
-
-        if ($structuredDataAddon !== 'none') {
-            $addons[] = $structuredDataAddon;
-        }
-
-        return $addons;
-    }
-
-    protected function copySeoProTemplates(): void
-    {
-        $source = base_path('vendor/justbetter/statamic-starter-kit/export/resources/views/layouts/seo');
-        $destination = base_path('resources/views/layouts/seo');
-        
-        if (File::exists($source)) {
-            File::copyDirectory($source, $destination);
-            info('📁 Copied SEO Pro templates');
-        }
-    }
-
-    protected function setupRapidezStatamic(): void
-    {
-        $this->rapidezStatamic = true;
-        
-        info('⚡ Setting up Rapidez Statamic...');
-        
-        $this->runCommand('php artisan statamic:install', 'Installing Statamic...');
-        $this->updateComposerScripts();
-        $this->runCommand('php artisan vendor:publish --provider=Rapidez\Statamic\RapidezStatamicServiceProvider --tag=rapidez-user-model', 'Publishing user model...');
-        $this->runCommand('php artisan vendor:publish --provider=Rapidez\Statamic\RapidezStatamicServiceProvider --tag=rapidez-statamic-content', 'Publishing Rapidez content...');
-        $this->runCommand('php artisan vendor:publish --provider=Rapidez\Statamic\RapidezStatamicServiceProvider --tag=views', 'Publishing views...');
-    }
-
-    protected function updateComposerScripts(): void
-    {
-        $composerFile = base_path('composer.json');
-        
-        if (!File::exists($composerFile)) {
-            return;
-        }
-
-        $composer = json_decode(File::get($composerFile), true);
-        
-        $composer['scripts'] ??= [];
-        $composer['scripts']['post-autoload-dump'] ??= [];
-        
-        $statamicInstallScript = '@php artisan statamic:install --ansi';
-        
-        if (!in_array($statamicInstallScript, $composer['scripts']['post-autoload-dump'])) {
-            $composer['scripts']['post-autoload-dump'][] = $statamicInstallScript;
-            File::put($composerFile, json_encode($composer, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-            info('📝 Updated composer.json with Statamic install script');
-        }
     }
 
     protected function configureProject(): void
     {
-        if ($this->rapidezStatamic || !confirm('Do you want to configure your project settings?', true)) {
+        if (!confirm('Do you want to configure your project settings?', true)) {
             return;
         }
 
@@ -216,7 +104,7 @@ class StarterKitPostInstall
 
     protected function setupMultisite(): void
     {
-        if ($this->rapidezStatamic || !confirm('Would you like to configure multisite? (Requires Statamic PRO license)', false)) {
+        if (!confirm('Would you like to configure multisite? (Requires Statamic PRO license)', false)) {
             return;
         }
 

@@ -10,14 +10,6 @@ Through Statamic CLI:
 statamic new my-site justbetter/statamic-starter-kit
 ```
 
-Or call through a command:
-
-```php
-$this->call('statamic:starter-kit:install', [
-    'package' => 'justbetter/statamic-starter-kit',
-]);
-```
-
 ## Convert to global component
 
 The Control Panel Replicator action that converts a set into a reusable global component entry is configurable. Publish the config (or set values in `config/statamic-starter-kit.php`) when your handles differ from the kit defaults.
