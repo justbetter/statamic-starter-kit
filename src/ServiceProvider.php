@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\View;
 use JustBetter\StatamicStarterKit\Http\Controllers\CP\StarterKitFormsController;
 use JustBetter\StatamicStarterKit\Http\ViewComposers\MailGlobalsComposer;
 use Statamic\Facades\Icon;
+use Statamic\Facades\Permission;
 use Statamic\Http\Controllers\CP\Forms\FormsController;
 use Statamic\Http\Middleware\RedirectAbsoluteDomains;
 use Statamic\Providers\AddonServiceProvider;
@@ -43,5 +44,52 @@ class ServiceProvider extends AddonServiceProvider
 
         Icon::register('custom-svg', resource_path('svg'));
         Icon::register('custom-icons', public_path('icons'));
+
+        $this
+            ->bootPermissions()
+            ->bootDashboardCacheWidget();
+    }
+
+    protected function bootPermissions(): static
+    {
+        Permission::extend(function (): void {
+            Permission::group('justbetter', 'JustBetter', function (): void {
+                Permission::register('clear caches')
+                    ->label(__('justbetter-starter-kit::messages.permission_clear_caches'));
+            });
+        });
+
+        return $this;
+    }
+
+    protected function bootDashboardCacheWidget(): static
+    {
+        if (! config('statamic-starter-kit.dashboard_cache_widget', true)) {
+            return $this;
+        }
+
+        $widgets = collect(config('statamic.cp.widgets', []));
+
+        $alreadyPresent = $widgets->contains(function (mixed $widget): bool {
+            $type = is_string($widget) ? $widget : ($widget['type'] ?? null);
+
+            return $type === 'caches';
+        });
+
+        if ($alreadyPresent) {
+            return $this;
+        }
+
+        config([
+            'statamic.cp.widgets' => $widgets
+                ->push([
+                    'type' => 'caches',
+                    'width' => 50,
+                    'can' => 'clear caches',
+                ])
+                ->all(),
+        ]);
+
+        return $this;
     }
 }
