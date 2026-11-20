@@ -286,8 +286,7 @@ return [
     */
 
     'set_preview_images' => [
-        'container' => 'assets',
-        'folder' => 'set-previews',
+        'container' => 'previews',
     ],
 
 ];
