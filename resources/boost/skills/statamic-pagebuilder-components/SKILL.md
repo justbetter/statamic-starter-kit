@@ -362,16 +362,35 @@ Never add margin-top or margin-bottom to the outer element. Margins between elem
 When you create a component, also create its configuration in Statamic.
 
 1. **Component fieldset**: `resources/fieldsets/component_{handle}.yaml`, which imports the fieldsets the component uses, plus any own fields.
-2. **Replicator**: add a set to the `page_builder` replicator in `resources/fieldsets/page_builder.yaml`, in the `components` group. The set imports the component fieldset and gets a preview image once the component is finished (see Preview image).
+2. **Replicator**: add a set to the `page_builder` replicator in `resources/fieldsets/page_builder.yaml`, in the set group of its category (see Set groups). The set imports the component fieldset and gets a preview image once the component is finished (see Preview image).
 
 ```yaml
-title_media:
-  display: 'Title + media'
-  image: title_media.webp
-  fields:
-    -
-      import: component_title_media
+sets:
+  text_media:
+    display: 'Tekst & media'
+    icon: hero-image-above-text
+    sets:
+      title_media:
+        display: 'Title + media'
+        image: title_media.webp
+        fields:
+          -
+            import: component_title_media
 ```
+
+   **Set groups.** The sets are grouped by the kind of content, so editors find a component in the set picker by what they want to show instead of scrolling one long list. Never put every set in a single `components` group; if a project still has one, split it into categories when you add a component, and tell the user. Use these groups, and add one only when a component fits none of them:
+
+   | Handle | Display | Icon | For |
+   |---|---|---|---|
+   | `text_media` | `'Tekst & media'` | `hero-image-above-text` | text, banners, content with media, timelines, media grids |
+   | `tiles` | `Tegels` | `layout-grid` | tiles and cards in a grid, logo grids |
+   | `overviews` | `Overzichten` | `collections` | fetched entries: collection teasers, overviews, maps |
+   | `questions_forms` | `'Vragen & formulieren'` | `forms` | accordions, FAQs, forms, calculators |
+   | `other` | `Overig` | `globe-world-wide-web` | global components and anything else |
+
+   - Variants of one component (`tile_with_icon`, `tile_with_icon_horizontal`) stay together in the same group.
+   - A group has a Dutch `display` and a Statamic `icon`; the available icons are in `vendor/statamic/cms/resources/svg/icons`.
+   - Stored content only keeps the set handle as `type`, not the group, so moving a set to another group needs no content migration.
 
 3. **Dutch labels**: write every text Statamic shows editors directly in Dutch in the YAML: display names, instructions, option labels and the fieldset title. No translations in `nl.json` for them.
    Labels follow the same rule as handles: **shape, not content**. Name what the field is, not what the design happens to put in it, because editors can later use it for something else: `Filter`, not `Leeftijdsfilter`; `Tegels`, not `Kaarten` or `Locaties`; `Filtercategorie`, not `Filtersleutel` (a technical term). Content from the design belongs in the instructions as an example (`bijv. "Leeftijd van je kind"`), never in the label.
@@ -468,7 +487,7 @@ Check that these exist before adding an image. In an older project without them,
 - [ ] Partials in `page_builder/{handle}/`; Blade components only for reused parts or loop items with their own logic
 - [ ] Alpine: inline `x-data` only for plain state; component files registered with `Alpine.asyncData` and used with `x-load`; state bound from Blade, elements found with `$refs`; data passed with `@js()`, translations kept in Blade
 - [ ] Vue (Rapidez): renderless components with slot props, props passed with `@js()`
-- [ ] `component_{handle}.yaml` created and set added to the `page_builder` replicator
+- [ ] `component_{handle}.yaml` created and set added to the `page_builder` replicator, in the set group of its category (no single `components` group)
 - [ ] Preview image `public/previews/{handle}.webp` taken from the design and set as `image` on the set; assets synced with `eloquent:sync-assets --container=previews`
 - [ ] Settings of the component (background, decoration, theme, anchor ID) and rarely used fields in `component_options`; directly visible fields are content only
 - [ ] Every option that sets a color names the color in brackets, including theme differences (`'Primair (blauw, Werken bij: groen)'`)
