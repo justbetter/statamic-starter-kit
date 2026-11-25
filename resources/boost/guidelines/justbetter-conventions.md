@@ -27,6 +27,7 @@ For Rapidez-specific questions, check https://docs.rapidez.io/llms.txt first.
 ## PHP
 
 - Never use `private` for methods, properties or constants. Use `protected` instead, so a project or package can extend and override the class.
+- Array types in PHPDoc are plain generics: `array<int, string>`, `array<string, int>`, `Collection<int, Entry>`. Never tuple shapes (`array{0: string, 1: 'asc'|'desc'}`), literal types (`'asc'|'desc'`) or `list<...>`. A named record shape (`array{slug: string, title: string}`) is allowed, but prefer a Data object when the structure is passed around. This applies to your own code; leave framework stubs (such as `list<string>` on `$fillable`) as they are.
 
 ## Querying Statamic data
 
