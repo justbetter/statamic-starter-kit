@@ -52,7 +52,7 @@ class FormEmailAvailableFieldsFieldtype extends Fieldtype
     /**
      * @return Collection<int, array{handle: string, label: string, token: string}>
      */
-    private function getAvailableFormFields(string $formHandle): Collection
+    protected function getAvailableFormFields(string $formHandle): Collection
     {
         $form = FormFacade::find($formHandle);
 
